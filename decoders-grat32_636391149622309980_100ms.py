@@ -227,7 +227,7 @@ def preprocess(jerk,neural_data):
 	y_test=y_test-y_train_mean
 	y_valid=y_valid-y_train_mean
 
-	return X_train,X_valid,y_train,y_valid
+	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
 
 # ## 4. Run Decoders
 
@@ -235,7 +235,7 @@ def preprocess(jerk,neural_data):
 
 
 
-def Wiener(X_train,X_valid,y_train,y_valid):
+def Wiener(X_flat_train,X_flat_valid,y_train,y_valid):
 	#Declare model
 	model_wf=WienerFilterDecoder()
 
@@ -419,10 +419,10 @@ if __name__ == "__main__":
 
 	jerk,neural_data = load_data(os.getcwd())
 
-	X_train,X_valid,y_train,y_valid = preprocess(jerk,neural_data)
+	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(jerk,neural_data)
 
 	if model_type == 'lstm':
 		model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
 	elif model_type == 'wiener':
-		model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
+		model_lstm = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 
