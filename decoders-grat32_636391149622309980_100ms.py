@@ -422,7 +422,9 @@ if __name__ == "__main__":
 	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(jerk,neural_data)
 
 	if model_type == 'lstm':
-		model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
+		model = run_LSTM(X_train,X_valid,y_train,y_valid)
 	elif model_type == 'wiener':
-		model_lstm = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
+		model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 
+	with open('model_' + model_type,'wb') as f:
+		pickle.dump(model,f)
