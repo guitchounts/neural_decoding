@@ -63,6 +63,8 @@ def load_data(folder,spectrogram=1):
 	# folder='/home/jglaser/Data/DecData/' 
 	# folder='/Users/jig289/Dropbox/Public/Decoding_Data/'
 
+	print folder+'/sortedspikes_win1step01.pickle'
+
 	with open(folder+'/sortedspikes_win1step01.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 	    spike_time_vec,neural_data=pickle.load(f) #If using python 2
@@ -81,10 +83,12 @@ def load_data(folder,spectrogram=1):
 	if spectrogram == 1:
 		###### ? load the spectrogrammed data:
 		jerk_data = h5py.File(folder+'/jerk_spec_win1step01.mat','r')
+		
 		jerk_spec = jerk_data['jerk_spec']
 		jerk_time = jerk_data['t']
 		jerk_freq = jerk_data['f']
-		jerk_file.close()
+		#jerk_data.close()
+		
 
 		jerk = np.mean(jerk_spec,axis=1).T
 	else:
@@ -231,7 +235,7 @@ def preprocess(jerk,neural_data):
 
 
 
-def Wiener():
+def Wiener(X_train,X_valid,y_train,y_valid):
 	#Declare model
 	model_wf=WienerFilterDecoder()
 
@@ -245,11 +249,9 @@ def Wiener():
 	R2s_wf=get_R2(y_valid,y_valid_predicted_wf)
 	print('R2s:', R2s_wf)
 
+	plot_results(y_valid,y_valid_predicted_wf)
 
-	# In[38]:
-
-	plt.scatter(y_valid,y_valid_predicted_wf,alpha=0.1,marker='o')
-	plt.axis('equal')
+	return model_wf
 
 def WienerCascade():
 	# ### 4B. Wiener Cascade (Linear Nonlinear Model)
@@ -384,15 +386,19 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	R2s_lstm=get_R2(y_valid,y_valid_predicted_lstm)
 	print('R2s:', R2s_lstm)
 
+	plot_results(y_valid,y_valid_predicted_wf)
+
+	return model_lstm
+
+
+def plot_results(y_valid,y_valid_predicted_wf):
 	fig_x_wf=plt.figure(dpi=600)
 	#plt.plot(y_valid[1000:2000,0]+y_train_mean[0],'b')
 	#plt.plot(y_valid_predicted_wf[1000:2000,0]+y_train_mean[0],'r')
 
 	plt.scatter(y_valid,y_valid_predicted_wf,alpha=0.1,marker='o')
 	plt.axis('equal')
-	fig_x_wf.savefig('x_velocity_decoding.pdf')
-
-	return model_lstm
+	fig_x_wf.savefig('test_vs_predicted.pdf')
 
 
 # ## 5. Make Plots
@@ -409,10 +415,14 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 # In[ ]:
 if __name__ == "__main__":
 
+	model_type = sys.argv[1] ## wiener or lstm
 
 	jerk,neural_data = load_data(os.getcwd())
 
 	X_train,X_valid,y_train,y_valid = preprocess(jerk,neural_data)
 
-	model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
+	if model_type == 'lstm':
+		model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
+	elif model_type == 'wiener':
+		model_lstm = run_LSTM(X_train,X_valid,y_train,y_valid)
 
