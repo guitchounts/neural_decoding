@@ -63,7 +63,7 @@ def load_data(folder,spectrogram=1):
 	# folder='/home/jglaser/Data/DecData/' 
 	# folder='/Users/jig289/Dropbox/Public/Decoding_Data/'
 
-	with open(folder+'sortedspikes_win1step01.pickle','rb') as f:
+	with open(folder+'/sortedspikes_win1step01.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 	    spike_time_vec,neural_data=pickle.load(f) #If using python 2
 
@@ -80,7 +80,7 @@ def load_data(folder,spectrogram=1):
 
 	if spectrogram == 1:
 		###### ? load the spectrogrammed data:
-		jerk_data = h5py.File(folder+'jerk_spec_win1step01.mat','r')
+		jerk_data = h5py.File(folder+'/jerk_spec_win1step01.mat','r')
 		jerk_spec = jerk_data['jerk_spec']
 		jerk_time = jerk_data['t']
 		jerk_freq = jerk_data['f']
@@ -88,7 +88,7 @@ def load_data(folder,spectrogram=1):
 
 		jerk = np.mean(jerk_spec,axis=1).T
 	else:
-		downsampled_jerk = io.loadmat(folder+'downsampled_jerk_timeseries.mat')
+		downsampled_jerk = io.loadmat(folder+'/downsampled_jerk_timeseries.mat')
 		raw_jerk = downsampled_jerk['downsampled_jerk']
 		jerk = raw_jerk.T
 
