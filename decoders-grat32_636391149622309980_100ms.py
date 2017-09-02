@@ -22,7 +22,7 @@
 #Import standard packages
 import numpy as np
 import matplotlib.pyplot as plt
-get_ipython().magic(u'matplotlib inline')
+import sys,os
 from scipy import io
 from scipy import stats
 import pickle
@@ -387,7 +387,7 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	fig_x_wf=plt.figure(dpi=600)
 	#plt.plot(y_valid[1000:2000,0]+y_train_mean[0],'b')
 	#plt.plot(y_valid_predicted_wf[1000:2000,0]+y_train_mean[0],'r')
-	
+
 	plt.scatter(y_valid,y_valid_predicted_wf,alpha=0.1,marker='o')
 	plt.axis('equal')
 	fig_x_wf.savefig('x_velocity_decoding.pdf')
