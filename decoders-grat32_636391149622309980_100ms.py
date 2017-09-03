@@ -249,7 +249,7 @@ def Wiener(X_flat_train,X_flat_valid,y_train,y_valid):
 	R2s_wf=get_R2(y_valid,y_valid_predicted_wf)
 	print('R2s:', R2s_wf)
 
-	plot_results(y_valid,y_valid_predicted_wf)
+	#plot_results(y_valid,y_valid_predicted_wf)
 
 	return model_wf
 
@@ -386,7 +386,7 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	R2s_lstm=get_R2(y_valid,y_valid_predicted_lstm)
 	print('R2s:', R2s_lstm)
 
-	plot_results(y_valid,y_valid_predicted_wf)
+	#plot_results(y_valid,y_valid_predicted_wf)
 
 	return model_lstm
 
