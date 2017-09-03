@@ -425,5 +425,5 @@ if __name__ == "__main__":
 	elif model_type == 'wiener':
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 
-	with open('model_' + model_type + '_rawjerk,'wb') as f:
+	with open('model_' + model_type + '_rawjerk','wb') as f:
 		pickle.dump(data_model,f)
