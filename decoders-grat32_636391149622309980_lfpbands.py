@@ -84,8 +84,8 @@ def load_data(folder,spectrogram=0):
 	neural_data = np.array(neural_data).T
 	jerk = np.array(jerk).T
 
-	neural_data = neural_data[0:neural_data.shape[0]/100,:]
-	jerk = jerk[0:jerk.shape[0]/100,:]
+	neural_data = neural_data[0:neural_data.shape[0]/50,:]
+	jerk = jerk[0:jerk.shape[0]/50,:]
 
 
 	print 'shape of neural data and jerk === ', neural_data.shape, jerk.shape
@@ -107,9 +107,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=5 #How many bins of neural data prior to the output are used for decoding
+	bins_before=300 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=5 #How many bins of neural data after the output are used for decoding
+	bins_after=300 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
