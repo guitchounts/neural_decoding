@@ -63,39 +63,18 @@ def load_data(folder,spectrogram=0):
 	# folder='/home/jglaser/Data/DecData/' 
 	# folder='/Users/jig289/Dropbox/Public/Decoding_Data/'
 
-	print folder+'/sortedspikes_win1step01.pickle'
+	
 
 	with open(folder+'/sortedspikes_win1step01.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 	    spike_time_vec,neural_data=pickle.load(f) #If using python 2
 
-
-	# In[5]:
-
-	neural_data = neural_data.T
-
-
-	#### LOAD THE Behavior data:
-
+    data_file = h5py.File(folder+'/lfpbands_jerkraw.mat','r')
 	
+	neural_data = data_file['lfp_bands']
 	
-
-	if spectrogram == 1:
-		###### ? load the spectrogrammed data:
-		jerk_data = h5py.File(folder+'/jerk_spec_win1step01.mat','r')
-		
-		jerk_spec = jerk_data['jerk_spec']
-		jerk_time = jerk_data['t']
-		jerk_freq = jerk_data['f']
-		#jerk_data.close()
-		jerk = np.mean(jerk_spec,axis=1).T
-
-	else:
-		downsampled_jerk = io.loadmat(folder+'/downsampled_jerk_timeseries.mat')
-		raw_jerk = downsampled_jerk['downsampled_jerk']
-		jerk = raw_jerk.T
-
-
+	jerk = data_file['jerk_dat']
+	
 
 	# In[78]:
 
@@ -115,9 +94,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=25 #How many bins of neural data prior to the output are used for decoding
+	bins_before=15000 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=25 #How many bins of neural data after the output are used for decoding
+	bins_after=15000 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
@@ -225,6 +204,8 @@ def preprocess(jerk,neural_data):
 	y_train=y_train-y_train_mean
 	y_test=y_test-y_train_mean
 	y_valid=y_valid-y_train_mean
+
+	print 'X_flat_train.shape, y_train.shape = ', X_flat_train.shape,y_train.shape
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
 
