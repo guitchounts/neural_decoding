@@ -82,6 +82,9 @@ def load_data(folder,spectrogram=0):
 	neural_data = np.array(neural_data).T
 	jerk = np.array(jerk).T
 
+	neural_data = neural_data[0:neural_data.shape[0]/100,:]
+	jerk = jerk[0:jerk.shape[0]/100,:]
+
 
 	print 'shape of neural data and jerk === ', neural_data.shape, jerk.shape
 	# In[78]:
