@@ -107,9 +107,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=300 #How many bins of neural data prior to the output are used for decoding
+	bins_before=150 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=300 #How many bins of neural data after the output are used for decoding
+	bins_after=150 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
