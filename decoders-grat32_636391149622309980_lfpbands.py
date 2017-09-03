@@ -366,6 +366,12 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	R2s_lstm=get_R2(y_valid,y_valid_predicted_lstm)
 	print('R2s:', R2s_lstm)
 
+	print 'Results: '
+	print 'y_valid_predicted_lstm = ', y_valid_predicted_lstm
+	print 'y_valid = ', y_valid
+
+	np.savez('lstm_ypredicted.npz',y_valid_predicted_lstm=y_valid_predicted_lstm,y_valid=y_valid)
+
 	plot_results(y_valid,y_valid_predicted_lstm)
 
 	return model_lstm
