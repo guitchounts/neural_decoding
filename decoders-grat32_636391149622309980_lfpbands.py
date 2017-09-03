@@ -65,9 +65,9 @@ def load_data(folder,spectrogram=0):
 
 	
 
-	with open(folder+'/sortedspikes_win1step01.pickle','rb') as f:
+	#with open(folder+'/sortedspikes_win1step01.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
-	    spike_time_vec,neural_data=pickle.load(f) #If using python 2
+	#    spike_time_vec,neural_data=pickle.load(f) #If using python 2
 
     data_file = h5py.File(folder+'/lfpbands_jerkraw.mat','r')
 	
