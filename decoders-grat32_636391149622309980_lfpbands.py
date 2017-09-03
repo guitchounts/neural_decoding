@@ -75,6 +75,9 @@ def load_data(folder,spectrogram=0):
 
 	jerk = data_file['jerk_dat']
 
+	### are these just way too long? 
+	neural_data = neural_data[0:neural_data.shape[0]/2,:]
+	jerk = jerk[0:jerk.shape[0]/2,:]
 
 	# In[78]:
 
@@ -94,9 +97,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=150 #How many bins of neural data prior to the output are used for decoding
+	bins_before=5 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=150 #How many bins of neural data after the output are used for decoding
+	bins_after=5 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
