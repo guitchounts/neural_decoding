@@ -76,8 +76,13 @@ def load_data(folder,spectrogram=0):
 	jerk = data_file['jerk_dat']
 
 	### are these just way too long? 
-	neural_data = neural_data[0:neural_data.shape[0]/2,:]
-	jerk = jerk[0:jerk.shape[0]/2,:]
+	#neural_data = neural_data[0:neural_data.shape[0]/2,:]
+	#jerk = jerk[0:jerk.shape[0]/2,:]
+
+	neural_data = neural_data.T
+	jerk = jerk.T
+
+
 	print 'shape of neural data and jerk === ', neural_data.shape, jerk.shape
 	# In[78]:
 
