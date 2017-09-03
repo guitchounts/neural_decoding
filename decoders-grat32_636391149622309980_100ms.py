@@ -44,7 +44,7 @@ from decoders import LSTMDecoder
 from decoders import XGBoostDecoder
 from decoders import SVRDecoder
 
-def load_data(folder,spectrogram=1):
+def load_data(folder,spectrogram=0):
 	# ## 2. Load Data
 	# The data file for this example can be downloaded at https://dl.dropboxusercontent.com/u/2944301/Decoding_Data/example_data_s1.pickle. It was recorded by Raeed Chowdhury from Lee Miller's lab at Northwestern.
 	# 
@@ -88,9 +88,8 @@ def load_data(folder,spectrogram=1):
 		jerk_time = jerk_data['t']
 		jerk_freq = jerk_data['f']
 		#jerk_data.close()
-		
-
 		jerk = np.mean(jerk_spec,axis=1).T
+
 	else:
 		downsampled_jerk = io.loadmat(folder+'/downsampled_jerk_timeseries.mat')
 		raw_jerk = downsampled_jerk['downsampled_jerk']
@@ -422,9 +421,9 @@ if __name__ == "__main__":
 	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(jerk,neural_data)
 
 	if model_type == 'lstm':
-		model = run_LSTM(X_train,X_valid,y_train,y_valid)
+		data_model = run_LSTM(X_train,X_valid,y_train,y_valid)
 	elif model_type == 'wiener':
-		model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
+		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 
-	with open('model_' + model_type,'wb') as f:
-		pickle.dump(model,f)
+	with open('model_' + model_type + '_rawjerk,'wb') as f:
+		pickle.dump(data_model,f)
