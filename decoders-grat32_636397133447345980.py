@@ -61,14 +61,14 @@ def load_data(folder,spectrogram=0):
 
 
 
-	with open(folder+'theta_xyspeed.pickle','rb') as f:
+	with open('theta_xyspeed.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 		[theta,xy_speed]=pickle.load(f) #If using python 2
 
 
 
-    with open(folder+'interp_IMU_Oxyz_Axyz.pickle','rb') as f:
-#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
+	with open('interp_IMU_Oxyz_Axyz.pickle','rb') as f:
+	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 		[splrep_ox,splrep_oy,splrep_oz,splrep_ax,splrep_ay,splrep_az]=pickle.load(f) #If using python 2
 
 
@@ -118,47 +118,47 @@ def load_data(folder,spectrogram=0):
 def get_power_bands(lfp_spec,freqs):
 
 
-    freq_bands = [ [0,4],[4,8],[8,12],[12,30],[30,60],[60,150] ]
+	freq_bands = [ [0,4],[4,8],[8,12],[12,30],[30,60],[60,150] ]
 
-    lfp_power = np.zeros([64*6,lfp_spec.shape[2]])  ## 64 channels x 4 bands
+	lfp_power = np.zeros([64*6,lfp_spec.shape[2]])  ## 64 channels x 4 bands
 
-    counter = 0
+	counter = 0
 
-    for ch in range(64):    
-        
-        for freq_band in freq_bands:
-            power = get_power(lfp_spec[ch,:,:],freq_band,freqs)
+	for ch in range(64):    
+		
+		for freq_band in freq_bands:
+			power = get_power(lfp_spec[ch,:,:],freq_band,freqs)
 
-            lfp_power[counter,:] = power
-            counter += 1
-        #power_0_4 = get_power(lfp_spec[ch,:,:],[0,4],freqs)
-        #power_4_8 = get_power(lfp_spec[ch,:,:],[4,8],freqs)
-        #power_8_12 = get_power(lfp_spec[ch,:,:],[8,12],freqs)
-        #power_15_40 = get_power(lfp_spec[ch,:,:],[15,40],freqs)
-        #power_40_100 = get_power(lfp_spec[ch,:,:],[40,100],freqs)
-        #lfp_power[ch*4:(ch+1)*4,:] = power_0_4,power_5_15,power_15_40,power_40_100
+			lfp_power[counter,:] = power
+			counter += 1
+		#power_0_4 = get_power(lfp_spec[ch,:,:],[0,4],freqs)
+		#power_4_8 = get_power(lfp_spec[ch,:,:],[4,8],freqs)
+		#power_8_12 = get_power(lfp_spec[ch,:,:],[8,12],freqs)
+		#power_15_40 = get_power(lfp_spec[ch,:,:],[15,40],freqs)
+		#power_40_100 = get_power(lfp_spec[ch,:,:],[40,100],freqs)
+		#lfp_power[ch*4:(ch+1)*4,:] = power_0_4,power_5_15,power_15_40,power_40_100
 
 
-    
-    return lfp_power
+	
+	return lfp_power
 
 
 def get_freq_idx(freqs,desired_freq): # make desired_freq a tuple, e.g. (0,4)
-    idx = []
-    for counter,value in enumerate(freqs):
-        if  desired_freq[0] <= value <= desired_freq[1]:
-            #yield counter
-            idx.append(counter)
-    return idx
+	idx = []
+	for counter,value in enumerate(freqs):
+		if  desired_freq[0] <= value <= desired_freq[1]:
+			#yield counter
+			idx.append(counter)
+	return idx
 
 
 def get_power(spec,freq_range,freqs):
 
-    idx = get_freq_idx(freqs,freq_range)
+	idx = get_freq_idx(freqs,freq_range)
 
-    power = np.mean(spec[idx,:],0)
+	power = np.mean(spec[idx,:],0)
 
-    return power
+	return power
 
 def preprocess(jerk,neural_data):
 	# ## 3. Preprocess Data
