@@ -106,6 +106,7 @@ def load_data(folder,spectrogram=0):
 
 
 	lfp_power = get_power_bands(lfp_spec_4aligning,lfp_freq)
+	lfp_power = lfp_power.T
 
 	
 	y = np.vstack([decimated_ax,decimated_ay,decimated_az,decimated_ox,decimated_oy,decimated_oz,decimated_xy_speed,decimated_theta]).T
