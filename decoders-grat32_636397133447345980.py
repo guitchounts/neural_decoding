@@ -55,25 +55,25 @@ def load_data(folder,spectrogram=0):
 
 
 
-	with open('interp_IMUdata.pickle','rb') as f:
+	with open(folder+'/interp_IMUdata.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 		[splrep_dx,splrep_dy,splrep_dz,splrep_jerkx,splrep_jerky,splrep_jerkz,truncated_lfp_time]=pickle.load(f) #If using python 2
 
 
 
-	with open('theta_xyspeed.pickle','rb') as f:
+	with open(folder+'/theta_xyspeed.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 		[theta,xy_speed]=pickle.load(f) #If using python 2
 
 
 
-	with open('interp_IMU_Oxyz_Axyz.pickle','rb') as f:
+	with open(folder+'/interp_IMU_Oxyz_Axyz.pickle','rb') as f:
 	#     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
 		[splrep_ox,splrep_oy,splrep_oz,splrep_ax,splrep_ay,splrep_az]=pickle.load(f) #If using python 2
 
 
 
-	lfp_data = h5py.File(folder+'lfp_spec.mat','r')
+	lfp_data = h5py.File(folder+'/lfp_spec.mat','r')
 	lfp_spec = lfp_data['lfp_spec'][:]
 	lfp_time = lfp_data['t'][:]
 	lfp_freq = lfp_data['f'][:]
