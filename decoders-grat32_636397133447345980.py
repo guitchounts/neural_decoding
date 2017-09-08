@@ -96,8 +96,12 @@ def load_data(folder,spectrogram=0):
 	decimated_az = signal.decimate(signal.decimate(splrep_az,10,zero_phase=True),3,zero_phase=True)
 
 
-	lfp_spec_time_4aligning = lfp_time[np.where(np.isclose(lfp_time,truncated_lfp_time[0],rtol=1e-3))[0]:np.where(np.isclose(lfp_time,truncated_lfp_time[-1],rtol=1e-5))[0]]
-	lfp_spec_4aligning = lfp_spec[:,:,np.where(np.isclose(lfp_time,truncated_lfp_time[0],rtol=1e-3))[0]:np.where(np.isclose(lfp_time,truncated_lfp_time[-1],rtol=1e-5))[0]]
+	start = np.where(np.isclose(lfp_time,truncated_lfp_time[0],rtol=1e-3))[0][0]
+	stop = np.where(np.isclose(lfp_time,truncated_lfp_time[-1],rtol=1e-5))[0][0]
+	print 'start,stop = ', start,stop
+
+	lfp_spec_time_4aligning = lfp_time[start:stop]
+	lfp_spec_4aligning = lfp_spec[:,:,start:stop]
 
 
 
