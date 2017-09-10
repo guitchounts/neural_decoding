@@ -362,18 +362,25 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 	model_svr=SVRDecoder(C=5, max_iter=10000)
 
 	#Fit model
-	model_svr.fit(X_flat_train,y_zscore_train)
-
-	#Get predictions
-	y_zscore_valid_predicted_svr=model_svr.predict(X_flat_valid)
-
-	#Get metric of fit
-	R2s_svr=get_R2(y_zscore_valid,y_zscore_valid_predicted_svr)
-	print('R2s:', R2s_svr)
+	
 
 	for head_item in range(len(y_name)):
+		### fit one at a time and save/plot the results 
+		print '########### Fitting SVR on %s data ###########' % y_name[head_item]
 
-		plot_results(y_valid[:,head_item],y_valid_predicted_svr[:,head_item],y_name[head_item])
+		model_svr.fit(X_flat_train,y_zscore_train[:,head_item])
+
+		#Get predictions
+		y_zscore_valid_predicted_svr=model_svr.predict(X_flat_valid)
+
+		#Get metric of fit
+		R2s_svr=get_R2(y_zscore_valid[:,head_item],y_zscore_valid_predicted_svr)
+		print(y_name[head_item], 'R2:', R2s_svr)
+
+		np.savez(y_name[head_item] + '_svr_ypredicted.npz',y_zscore_valid=y_zscore_valid,y_zscore_valid_predicted_svr=y_zscore_valid_predicted_svr)
+
+
+		plot_results(y_zscore_valid[:,head_item],y_zscore_valid_predicted_svr,y_name[head_item],R2s_svr)
 
 def DNN():
 	# ### 4E. Dense Neural Network
@@ -452,11 +459,11 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	return model_lstm
 
 
-def plot_results(y_valid,y_valid_predicted,y_name):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s):
 
 
 	f, axarr = plt.subplots(2,dpi=600)
-	axarr[0].set_title('SVR Model of ' + y_name)
+	axarr[0].set_title('SVR Model of %s. R^2 = %d ' % (y_name,R2s))
 
 
 	axarr[0].plot(y_zscore_valid,linewidth=0.1)
