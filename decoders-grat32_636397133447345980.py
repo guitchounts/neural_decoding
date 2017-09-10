@@ -368,7 +368,9 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 		### fit one at a time and save/plot the results 
 		print '########### Fitting SVR on %s data ###########' % y_name[head_item]
 
-		model_svr.fit(X_flat_train,y_zscore_train[:,head_item])
+		y_zscore_train_item = np.reshaped(y_zscore_train[:,head_item],y_zscore_train.shape[0],1)
+
+		model_svr.fit(X_flat_train,y_zscore_train_item[:,head_item])
 
 		#Get predictions
 		y_zscore_valid_predicted_svr=model_svr.predict(X_flat_valid)
