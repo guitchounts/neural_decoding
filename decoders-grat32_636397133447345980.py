@@ -368,21 +368,26 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 		### fit one at a time and save/plot the results 
 		print '########### Fitting SVR on %s data ###########' % y_name[head_item]
 
-		y_zscore_train_item = np.reshaped(y_zscore_train[:,head_item],y_zscore_train.shape[0],1)
+		y_zscore_train_item = y_zscore_train[:,head_item]
+		y_zscore_train_item = np.reshape(y_zscore_train_item,[y_zscore_train.shape[0],1])
+		print 'shape of y_zscore_train_item = ', y_zscore_train_item.shape
 
-		model_svr.fit(X_flat_train,y_zscore_train_item[:,head_item])
+		y_zscore_valid_item = y_zscore_valid[:,head_item]
+		y_zscore_valid_item = np.reshape(y_zscore_valid_item,[y_zscore_valid_item.shape[0],1])
+
+		model_svr.fit(X_flat_train,y_zscore_train_item)
 
 		#Get predictions
 		y_zscore_valid_predicted_svr=model_svr.predict(X_flat_valid)
 
 		#Get metric of fit
-		R2s_svr=get_R2(y_zscore_valid[:,head_item],y_zscore_valid_predicted_svr)
+		R2s_svr=get_R2(y_zscore_valid_item,y_zscore_valid_predicted_svr)
 		print(y_name[head_item], 'R2:', R2s_svr)
 
-		np.savez(y_name[head_item] + '_svr_ypredicted.npz',y_zscore_valid=y_zscore_valid,y_zscore_valid_predicted_svr=y_zscore_valid_predicted_svr)
+		np.savez(y_name[head_item] + '_svr_ypredicted.npz',y_zscore_valid=y_zscore_valid_item,y_zscore_valid_predicted_svr=y_zscore_valid_predicted_svr)
 
 
-		plot_results(y_zscore_valid[:,head_item],y_zscore_valid_predicted_svr,y_name[head_item],R2s_svr)
+		plot_results(y_zscore_valid_item,y_zscore_valid_predicted_svr,y_name[head_item],R2s_svr)
 
 def DNN():
 	# ### 4E. Dense Neural Network
