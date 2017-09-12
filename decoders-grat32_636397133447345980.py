@@ -426,13 +426,13 @@ def DNN():
 	R2s_dnn=get_R2(y_valid,y_valid_predicted_dnn)
 	print('R2s:', R2s_dnn)
 
-def RNN():
+def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	# ### 4F. Simple RNN
 
 	# In[ ]:
 
 	#Declare model
-	model_rnn=SimpleRNNDecoder(units=400,dropout=0,num_epochs=5)
+	model_rnn=SimpleRNNDecoder(units=400,dropout=0,num_epochs=25)
 
 	#Fit model
 	model_rnn.fit(X_train,y_train)
@@ -443,6 +443,14 @@ def RNN():
 	#Get metric of fit
 	R2s_rnn=get_R2(y_valid,y_valid_predicted_rnn)
 	print('R2s:', R2s_rnn)
+
+	np.savez('rnn_results.npz',y_valid=y_valid,y_valid_predicted_rnn=y_valid_predicted_rnn,y_name=y_name)
+
+	for i in range(len(y_name)):
+
+		plot_results(np.reshape(y_valid[:,i],[y_valid.shape[0],1]), np.reshape(y_valid_predicted_rnn[:,i],[y_valid_predicted_rnn.shape[0],1]))
+
+
 
 def GRU():
 	# ### 4G. GRU (Gated Recurrent Unit)
@@ -525,6 +533,8 @@ if __name__ == "__main__":
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 	elif model_type == 'svr':
 		data_model = SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
+	elif model_type == 'rnn':
+		RNN(X_train,y_train,X_valid,y_valid,y_name)
 
 	#with open('model_' + model_type + '_rawjerk','wb') as f:
 	#	pickle.dump(data_model,f)
