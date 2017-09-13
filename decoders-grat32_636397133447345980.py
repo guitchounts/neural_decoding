@@ -112,31 +112,41 @@ def load_data(folder,spectrogram=0):
 	# lfp_power = lfp_power.T
 
 
-	head_data = np.load('all_head_data.npz')
+	#head_data = np.load('all_head_data.npz')
+
+	head_data = h5py.File('all_head_data.hdf5','r')
 	
-	dx = head_data['dx']
-	dy = head_data['dy']
-	dz = head_data['dz']
-	oz = head_data['oz']
-	oy = head_data['oy']
-	ox = head_data['ox']
-	ay = head_data['ay']
-	ax = head_data['ax']
-	az = head_data['az']
-	xy_acc = head_data['xy_acc']
-	theta = head_data['theta']
-	time = head_data['time']
+
+
+	dx = head_data['dx'][:]
+	dy = head_data['dy'][:]
+	dz = head_data['dz'][:]
+	oz = head_data['oz'][:]
+	oy = head_data['oy'][:]
+	ox = head_data['ox'][:]
+	ay = head_data['ay'][:]
+	ax = head_data['ax'][:]
+	az = head_data['az'][:]
+
+	head_data.close()
+	#xy_acc = head_data['xy_acc']
+	#theta = head_data['theta']
+	#time = head_data['time']
 
 
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
 
-	y = np.vstack([oz,xy_acc,theta]).T
-	y_name = ['oz','xy','theta']
+	y = np.vstack([oz,oy,ox]).T
+	y_name = ['oz','oy','ox']
 
 
-	lfp_file = np.load('lfp_power.npz')
-	lfp_power = lfp_file['lfp_power'].T
+	#lfp_file = np.load('lfp_power.npz')
+	lfp_file = h5py.File('lfp_power.hdf5','r')
+
+	lfp_power = lfp_file['lfp_power'][:].T
+
+	lfp_file.close()
 
 	print 'Shape of head data = ', y.shape
 	print 'Shape of LFP power = ', lfp_power.shape
