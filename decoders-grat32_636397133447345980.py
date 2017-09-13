@@ -137,8 +137,8 @@ def load_data(folder,spectrogram=0):
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
 
-	y = np.vstack([oz,oy,ox]).T
-	y_name = ['oz','oy','ox']
+	y = np.vstack([dz,dy,dx]).T
+	y_name = ['dz','dy','dx']
 
 
 	#lfp_file = np.load('lfp_power.npz')
