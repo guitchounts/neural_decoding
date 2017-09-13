@@ -734,9 +734,10 @@ class SVRDecoder(object):
         Typically in the 1000s takes a short amount of time on a laptop
     """
 
-    def __init__(self,max_iter=-1,C=3.0):
+    def __init__(self,max_iter=-1,C=3.0,gamma='auto'):
         self.max_iter=max_iter
         self.C=C
+        self.gamma = gamma
         return
 
 
@@ -758,7 +759,7 @@ class SVRDecoder(object):
         num_outputs=y_train.shape[1] #Number of outputs
         models=[] #Initialize list of models (there will be a separate model for each output)
         for y_idx in range(num_outputs): #Loop through outputs
-            model=SVR(C=self.C, max_iter=self.max_iter) #Initialize SVR model
+            model=SVR(C=self.C, max_iter=self.max_iter,gamma=self.gamma) #Initialize SVR model
             model.fit(X_flat_train, y_train[:,y_idx]) #Train the model
             models.append(model) #Add fit model to list of models
         self.model=models

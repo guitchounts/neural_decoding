@@ -47,7 +47,8 @@ from decoders import XGBoostDecoder
 from decoders import SVRDecoder
 
 import h5py
-
+import seaborn as sns
+sns.set_style('white')
 
 def load_data(folder,spectrogram=0):
 
@@ -127,8 +128,12 @@ def load_data(folder,spectrogram=0):
 	time = head_data['time']
 
 
-	y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
-	y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
+	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
+	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
+
+	y = np.vstack([oz,xy_acc,theta]).T
+	y_name = ['oz','xy','theta']
+
 
 	lfp_file = np.load('lfp_power.npz')
 	lfp_power = lfp_file['lfp_power'].T
@@ -136,53 +141,12 @@ def load_data(folder,spectrogram=0):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of LFP power = ', lfp_power.shape
 
-	return y, lfp_power,y_name
+	for i in range(3):
+		y[:,i] = signal.medfilt(y[:,i],[9])
 
 
-def get_power_bands(lfp_spec,freqs):
+	return y[0:4000,:], lfp_power[0:4000,:],y_name
 
-
-	freq_bands = [ [0,4],[4,8],[8,12],[12,30],[30,60],[60,150] ]
-
-	lfp_power = np.zeros([64*6,lfp_spec.shape[2]])  ## 64 channels x 4 bands
-
-	counter = 0
-
-	for ch in range(64):    
-		
-		for freq_band in freq_bands:
-			power = get_power(lfp_spec[ch,:,:],freq_band,freqs)
-
-			lfp_power[counter,:] = power
-			counter += 1
-		#power_0_4 = get_power(lfp_spec[ch,:,:],[0,4],freqs)
-		#power_4_8 = get_power(lfp_spec[ch,:,:],[4,8],freqs)
-		#power_8_12 = get_power(lfp_spec[ch,:,:],[8,12],freqs)
-		#power_15_40 = get_power(lfp_spec[ch,:,:],[15,40],freqs)
-		#power_40_100 = get_power(lfp_spec[ch,:,:],[40,100],freqs)
-		#lfp_power[ch*4:(ch+1)*4,:] = power_0_4,power_5_15,power_15_40,power_40_100
-
-
-	
-	return lfp_power
-
-
-def get_freq_idx(freqs,desired_freq): # make desired_freq a tuple, e.g. (0,4)
-	idx = []
-	for counter,value in enumerate(freqs):
-		if  desired_freq[0] <= value <= desired_freq[1]:
-			#yield counter
-			idx.append(counter)
-	return idx
-
-
-def get_power(spec,freq_range,freqs):
-
-	idx = get_freq_idx(freqs,freq_range)
-
-	power = np.mean(spec[idx,:],0)
-
-	return power
 
 def preprocess(jerk,neural_data):
 	# ## 3. Preprocess Data
@@ -378,7 +342,7 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 	y_zscore_valid=y_valid/y_train_std
 
 	#Declare model
-	model_svr=SVRDecoder(C=5, max_iter=10000)
+	model_svr=SVRDecoder(C=1, max_iter=10000)
 
 	#Fit model
 	
@@ -428,7 +392,7 @@ def DNN():
 
 def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	# ### 4F. Simple RNN
-
+	print '############################# RUNNING RNN #############################'
 	# In[ ]:
 
 	#Declare model
@@ -444,11 +408,11 @@ def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	R2s_rnn=get_R2(y_valid,y_valid_predicted_rnn)
 	print('R2s:', R2s_rnn)
 
-	np.savez('rnn_results.npz',y_valid=y_valid,y_valid_predicted_rnn=y_valid_predicted_rnn,y_name=y_name)
+	np.savez('rnn_results.npz',y_valid=y_valid,y_valid_predicted_rnn=y_valid_predicted_rnn,y_name=y_name,R2s_rnn=R2s_rnn)
 
 	for i in range(len(y_name)):
-
-		plot_results(np.reshape(y_valid[:,i],[y_valid.shape[0],1]), np.reshape(y_valid_predicted_rnn[:,i],[y_valid_predicted_rnn.shape[0],1]))
+		print '############################# Plotting %s #############################' % y_name[i]
+		plot_results(np.reshape(y_valid[:,i],[y_valid.shape[0],1]), np.reshape(y_valid_predicted_rnn[:,i],[y_valid_predicted_rnn.shape[0],1]),y_name[i],R2s_rnn[i])
 
 
 
@@ -497,17 +461,17 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s):
 
 
 	f, axarr = plt.subplots(2,dpi=600)
-	axarr[0].set_title('SVR Model of %s. R^2 = %d ' % (y_name,R2s))
+	axarr[0].set_title('SVR Model of %s. R^2 = %f ' % (y_name,R2s))
 
 
-	axarr[0].plot(y_zscore_valid,linewidth=0.1)
+	axarr[0].plot(y_valid,linewidth=0.1)
 	axarr[0].set_ylabel('Head Data')
 
-	axarr[0].plot(y_zscore_valid_predicted_svr,linewidth=0.1,color='red')
+	axarr[0].plot(y_valid_predicted,linewidth=0.1,color='red')
 
 
 	axarr[1].scatter(y_valid,y_valid_predicted,alpha=0.05,marker='o')
-	axarr[1].set_title('R2 = ' + str(R2s_svr[0]))
+	#axarr[1].set_title('R2 = ' + str(R2s))
 	axarr[1].set_xlabel('Actual')
 	axarr[1].set_ylabel('Predicted')
 	axarr[1].axis('equal')
