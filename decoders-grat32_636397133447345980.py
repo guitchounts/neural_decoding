@@ -352,7 +352,7 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 	y_zscore_valid=y_valid/y_train_std
 
 	#Declare model
-	model_svr=SVRDecoder(C=1, max_iter=10000,gamma=1e-4)
+	model_svr=SVRDecoder(C=1, max_iter=10000,gamma=1e-5)
 
 	#Fit model
 	
