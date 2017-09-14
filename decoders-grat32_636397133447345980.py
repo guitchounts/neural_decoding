@@ -128,6 +128,10 @@ def load_data(folder,spectrogram=0):
 	ax = head_data['ax'][:]
 	az = head_data['az'][:]
 
+	xy = np.sqrt(ax**2 + ay**2)
+
+	theta = np.rad2deg(np.arctan(ay/ax))
+
 	head_data.close()
 	#xy_acc = head_data['xy_acc']
 	#theta = head_data['theta']
@@ -137,8 +141,8 @@ def load_data(folder,spectrogram=0):
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
 
-	y = np.vstack([az,ay,ax]).T
-	y_name = ['az','ay','ax']
+	y = np.vstack([oz,dz,xy,theta]).T
+	y_name = ['oz','dz','xy','theta']
 
 
 	#lfp_file = np.load('lfp_power.npz')
@@ -151,11 +155,11 @@ def load_data(folder,spectrogram=0):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of LFP power = ', lfp_power.shape
 
-	for i in range(3):
+	for i in range(4):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
 
-	return y[0:4000,:], lfp_power[0:4000,:],y_name
+	return y, lfp_power,y_name
 
 
 def preprocess(jerk,neural_data):
@@ -352,7 +356,7 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 	y_zscore_valid=y_valid/y_train_std
 
 	#Declare model
-	model_svr=SVRDecoder(C=1, max_iter=10000,gamma=1e-4)
+	model_svr=SVRDecoder(C=1, max_iter=10000)
 
 	#Fit model
 	
