@@ -159,7 +159,7 @@ def load_data(folder,spectrogram=0):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
 
-	return y, lfp_power,y_name
+	return y[0:y.shape[0]/2,:], lfp_power,y_name[0:y.shape[0]/2,:]
 
 
 def preprocess(jerk,neural_data):
