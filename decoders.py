@@ -433,7 +433,10 @@ class SimpleRNNDecoder(object):
         model.add(SimpleRNN(self.units,input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout,activation='relu')) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
 
+        
+
         #Add dense connections to output layer
+        model.add(Dense(y_train.shape[1]))
         model.add(Dense(y_train.shape[1]))
 
         #Fit model (and set fitting parameters)
