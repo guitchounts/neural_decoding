@@ -413,22 +413,30 @@ def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	#Declare model
 	model_rnn=SimpleRNNDecoder(units=400,dropout=0,num_epochs=25)
 
-	#Fit model
-	model_rnn.fit(X_train,y_train)
+	for head_item in range(len(y_name)):
+		### fit one at a time and save/plot the results 
+		print '########### Fitting RNN on %s data ###########' % y_name[head_item]
 
-	#Get predictions
-	y_valid_predicted_rnn=model_rnn.predict(X_valid)
+		y_train_item = y_train[:,head_item]
+		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+		print 'shape of y_train_item = ', y_train_item.shape
 
-	#Get metric of fit
-	R2s_rnn=get_R2(y_valid,y_valid_predicted_rnn)
-	print('R2s:', R2s_rnn)
+		y_valid_item = y_valid[:,head_item]
+		y_valid_item = np.reshape(y_valid_item,[y_valid_item.shape[0],1])
 
-	np.savez('rnn_results.npz',y_valid=y_valid,y_valid_predicted_rnn=y_valid_predicted_rnn,y_name=y_name,R2s_rnn=R2s_rnn)
+		model_rnn.fit(X_train,y_train_item)
 
-	for i in range(len(y_name)):
-		print '############################# Plotting %s #############################' % y_name[i]
-		plot_results(np.reshape(y_valid[:,i],[y_valid.shape[0],1]), np.reshape(y_valid_predicted_rnn[:,i],[y_valid_predicted_rnn.shape[0],1]),y_name[i],R2s_rnn[i])
+		#Get predictions
+		y_valid_predicted_rnn=model_rnn.predict(X_valid)
 
+		#Get metric of fit
+		R2s_rnn=get_R2(y_valid_item,y_valid_predicted_rnn)
+		print(y_name[head_item], 'R2:', R2s_rnn)
+
+		np.savez(y_name[head_item] + '_rnn_ypredicted.npz',y_valid=y_valid_item,y_valid_predicted_rnn=y_valid_predicted_rnn)
+
+
+		plot_results(y_valid_item,y_valid_predicted_rnn,y_name[head_item],R2s_rnn)
 
 
 def GRU():
@@ -476,7 +484,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s):
 
 
 	f, axarr = plt.subplots(2,dpi=600)
-	axarr[0].set_title('SVR Model of %s. R^2 = %f ' % (y_name,R2s))
+	axarr[0].set_title('RNN Model of %s. R^2 = %f ' % (y_name,R2s))
 
 
 	axarr[0].plot(y_valid,linewidth=0.1)
@@ -492,7 +500,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s):
 	axarr[1].axis('equal')
 
 	sns.despine(left=True,bottom=True)
-	f.savefig('svr_%s_.pdf' % y_name)
+	f.savefig('rnn_%s_.pdf' % y_name)
 
 
 
@@ -505,6 +513,10 @@ if __name__ == "__main__":
 	hea_data,neural_data,y_name = load_data(os.getcwd())
 
 	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(hea_data,neural_data)
+
+	### SVR params to iterate through:
+	Cs = np.arange()
+
 
 	if model_type == 'lstm':
 		data_model = run_LSTM(X_train,X_valid,y_train,y_valid)
