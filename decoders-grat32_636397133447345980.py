@@ -158,7 +158,7 @@ def load_data(folder,spectrogram=0):
 	for i in range(4):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
-	idx = int(y.shape[0]/2)
+	idx = 2000 #int(y.shape[0]/2)
 	print 'max idx = ', idx
 	return y[0:idx,], lfp_power[0:idx,:],y_name
 
@@ -357,8 +357,8 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 	y_zscore_valid=y_valid/y_train_std
 
 	#Declare model
-	model_svr=SVRDecoder(C=1, max_iter=10000)
-
+	model_svr=SVRDecoder(C=.1, max_iter=10000,gamma=1e-5)
+	
 	#Fit model
 	
 
