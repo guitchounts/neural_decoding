@@ -350,7 +350,7 @@ def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	# In[ ]:
 
 	#Declare model
-	model_rnn=SimpleRNNDecoder(units=400,dropout=0,num_epochs=25)
+	model_rnn=SimpleRNNDecoder(units=400,dropout=0,num_epochs=100)
 
 	for head_item in range(len(y_name)):
 		### fit one at a time and save/plot the results 
@@ -449,14 +449,11 @@ if __name__ == "__main__":
 
 	model_type = sys.argv[1] ## wiener or lstm
 
-	hea_data,neural_data,y_name = load_data(os.getcwd())
+	head_data,neural_data,y_name = load_data(os.getcwd())
 
-	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(hea_data,neural_data)
+	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(head_data,neural_data)
 
-	### SVR params to iterate through:
-	Cs = np.arange()
-
-
+	
 	if model_type == 'lstm':
 		data_model = run_LSTM(X_train,X_valid,y_train,y_valid)
 	elif model_type == 'wiener':
