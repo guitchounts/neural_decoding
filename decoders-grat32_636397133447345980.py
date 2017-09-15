@@ -52,68 +52,6 @@ sns.set_style('white')
 
 def load_data(folder,spectrogram=0):
 
-
-#folder = '/Users/guitchounts/Dropbox (coxlab)/Ephys/Data/Grat32/636397133447345980//'
-
-
-
-
-	# with open(folder+'/interp_IMUdata.pickle','rb') as f:
-	# #     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
-	# 	[splrep_dx,splrep_dy,splrep_dz,splrep_jerkx,splrep_jerky,splrep_jerkz,truncated_lfp_time]=pickle.load(f) #If using python 2
-
-
-
-	# with open(folder+'/theta_xyspeed.pickle','rb') as f:
-	# #     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
-	# 	[theta,xy_speed]=pickle.load(f) #If using python 2
-
-
-
-	# with open(folder+'/interp_IMU_Oxyz_Axyz.pickle','rb') as f:
-	# #     neural_data,vels_binned=pickle.load(f,encoding='latin1') #If using python 3
-	# 	[splrep_ox,splrep_oy,splrep_oz,splrep_ax,splrep_ay,splrep_az]=pickle.load(f) #If using python 2
-
-
-
-	# lfp_data = h5py.File(folder+'/lfp_spec.mat','r')
-	# lfp_spec = lfp_data['lfp_spec'][:]
-	# lfp_time = lfp_data['t'][:]
-	# lfp_freq = lfp_data['f'][:]
-
-
-	# ###### head data is at 300 Hz now. Decimate to 10 hz to match LFP power data
-
-
-	# #[xy_speed,theta,splrep_ox,splrep_oy,splrep_oz,splrep_ax,splrep_ay,splrep_az]
-
-	# decimated_xy_speed = signal.decimate(signal.decimate(xy_speed,10,zero_phase=True),3,zero_phase=True)
-	# decimated_theta = signal.decimate(signal.decimate(theta,10,zero_phase=True),3,zero_phase=True)
-
-	# decimated_ox = signal.decimate(signal.decimate(splrep_ox,10,zero_phase=True),3,zero_phase=True)
-	# decimated_oy = signal.decimate(signal.decimate(splrep_oy,10,zero_phase=True),3,zero_phase=True)
-	# decimated_oz = signal.decimate(signal.decimate(splrep_oz,10,zero_phase=True),3,zero_phase=True)
-
-	# decimated_ax = signal.decimate(signal.decimate(splrep_ax,10,zero_phase=True),3,zero_phase=True)
-	# decimated_ay = signal.decimate(signal.decimate(splrep_ay,10,zero_phase=True),3,zero_phase=True)
-	# decimated_az = signal.decimate(signal.decimate(splrep_az,10,zero_phase=True),3,zero_phase=True)
-
-
-	# start = np.where(np.isclose(lfp_time,truncated_lfp_time[0],rtol=1e-3))[0][0]
-	# stop = np.where(np.isclose(lfp_time,truncated_lfp_time[-1],rtol=1e-5))[0][0]
-	# print 'start,stop = ', start,stop
-
-	# lfp_spec_time_4aligning = lfp_time[start:stop]
-	# lfp_spec_4aligning = lfp_spec[:,:,start:stop]
-
-
-
-	# lfp_power = get_power_bands(lfp_spec_4aligning,lfp_freq)
-	# lfp_power = lfp_power.T
-
-
-	#head_data = np.load('all_head_data.npz')
-
 	head_data = h5py.File('all_head_data.hdf5','r')
 	
 
@@ -406,6 +344,7 @@ def DNN():
 	print('R2s:', R2s_dnn)
 
 def RNN(X_train,y_train,X_valid,y_valid,y_name):
+	model_name = 'RNN'
 	# ### 4F. Simple RNN
 	print '############################# RUNNING RNN #############################'
 	# In[ ]:
@@ -436,7 +375,7 @@ def RNN(X_train,y_train,X_valid,y_valid,y_name):
 		np.savez(y_name[head_item] + '_rnn_ypredicted.npz',y_valid=y_valid_item,y_valid_predicted_rnn=y_valid_predicted_rnn)
 
 
-		plot_results(y_valid_item,y_valid_predicted_rnn,y_name[head_item],R2s_rnn)
+		plot_results(y_valid_item,y_valid_predicted_rnn,y_name[head_item],R2s_rnn,model_name)
 
 
 def GRU():
@@ -480,11 +419,11 @@ def run_LSTM(X_train,X_valid,y_train,y_valid):
 	return model_lstm
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='SVR'):
 
 
 	f, axarr = plt.subplots(2,dpi=600)
-	axarr[0].set_title('RNN Model of %s. R^2 = %f ' % (y_name,R2s))
+	axarr[0].set_title(model_name +' Model of %s. R^2 = %f ' % (y_name,R2s))
 
 
 	axarr[0].plot(y_valid,linewidth=0.1)
@@ -500,7 +439,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s):
 	axarr[1].axis('equal')
 
 	sns.despine(left=True,bottom=True)
-	f.savefig('rnn_%s_.pdf' % y_name)
+	f.savefig(model_name + '_%s.pdf' % y_name)
 
 
 
