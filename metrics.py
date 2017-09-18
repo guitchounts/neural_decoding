@@ -16,6 +16,12 @@ def get_R2(y_test,y_test_pred):
     -------
     R2_array: An array of R2s for each output
     """
+    if len(y_test.shape) == 1:
+        y_test = np.reshape(y_test,[y_test.shape[0],1])
+
+    if len(y_test_pred.shape) == 1:
+        y_test_pred = np.reshape(y_test_pred,[y_test_pred.shape[0],1])
+
 
     R2_list=[] #Initialize a list that will contain the R2s for all the outputs
     for i in range(y_test.shape[1]): #Loop through outputs
