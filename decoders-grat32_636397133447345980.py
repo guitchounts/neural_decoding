@@ -68,7 +68,7 @@ def load_data(folder,spectrogram=0):
 
 	xy = np.sqrt(ax**2 + ay**2)
 
-	theta = np.rad2deg(np.arctan(ay/ax))
+	theta = np.rad2deg(np.arctan(ax/ay))
 
 	head_data.close()
 	#xy_acc = head_data['xy_acc']

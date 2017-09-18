@@ -73,7 +73,7 @@ def load_data(folder,spectrogram=0):
 
     xyz = np.sqrt(ax**2 + ay**2 + az**2)
 
-    theta = np.rad2deg(np.arctan(ay/ax))
+    theta = np.rad2deg(np.arctan(ax/ay))
 
     head_data.close()
     #xy_acc = head_data['xy_acc']
@@ -170,10 +170,10 @@ def preprocess(y,neural_data):
     y_train=y[training_set,:]
 
     #Get testing data
-    X_test=X[testing_set,:,:]
-    X_flat_test=X_flat[testing_set,:]
+    #X_test=X[testing_set,:,:]
+    #X_flat_test=X_flat[testing_set,:]
 
-    y_test=y[testing_set,:]
+    #y_test=y[testing_set,:]
 
     #Get validation data
     X_valid=X[valid_set,:,:]
@@ -205,20 +205,22 @@ def preprocess(y,neural_data):
     # y_test=y_test-y_train_mean
     # y_valid=y_valid-y_train_mean
 
-    scaler = StandardScaler()
+    X_scaler = StandardScaler().fit(X_flat_valid)
+    y_scaler = StandardScaler().fit(y_valid)
 
-    X_flat_train = scaler.fit_transform(X_flat_train)
-    y_train = scaler.fit_transform(y_train)
 
-    X_flat_valid = scaler.transform(X_flat_valid)
-    y_valid = scaler.transform(y_valid)
+    X_flat_train = X_scaler.transform(X_flat_train)
+    y_train = y_scaler.transform(y_train)
+
+    X_flat_valid = X_scaler.transform(X_flat_valid)
+    y_valid = y_scaler.transform(y_valid)
 
     return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
 
 # ## 4. Run Decoders
 
 
-def SVR(X_train,X_test,y_train,y_test,y_name):
+def run_SVR(X_train,X_test,y_train,y_test,y_name):
     # ### 4D. SVR (Support Vector Regression)
 
     C_range = np.logspace(-6, 2, 13) # was: 13 not 4 
@@ -231,7 +233,7 @@ def SVR(X_train,X_test,y_train,y_test,y_name):
 
     for head_item in range(len(y_name)):
 
-        model_svr = GridSearchCV(SVR(kernel='rbf',cache_size=1000), cv=5, n_jobs=8
+        model_svr = GridSearchCV(SVR(cache_size=1000), cv=5, n_jobs=6,
                    param_grid={"C": C_range,   # [1e0, 1e1, 1e2, 1e3]
                                "gamma": gamma_range},)  ##  np.logspace(-2, 2, 5)
     
@@ -240,11 +242,11 @@ def SVR(X_train,X_test,y_train,y_test,y_name):
         print '########### Fitting SVR on %s data ###########' % y_name[head_item]
 
         y_train_item = y_train[:,head_item]
-        y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+        #y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
         print 'shape of y_train_item = ', y_train_item.shape
 
         y_test_item = y_test[:,head_item]
-        y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+        #y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 
         model_svr.fit(X_train,y_train_item)
 
@@ -306,7 +308,7 @@ if __name__ == "__main__":
     elif model_type == 'wiener':
         data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
     elif model_type == 'svr':
-        data_model = SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
+        data_model = run_SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
     elif model_type == 'rnn':
         RNN(X_train,y_train,X_valid,y_valid,y_name)
 
