@@ -147,7 +147,7 @@ def preprocess(y,neural_data):
 
     X_flat = pca.fit_transform(X_flat)
 
-
+    #X_train, X_test, y_train, y_test = train_test_split(X_flat, y, test_size=0.5, random_state=42)
     # ### 3C. Split into training / testing / validation sets
     # Note that hyperparameters should be determined using a separate validation set. 
     # Then, the goodness of fit should be be tested on a testing set (separate from the training and validation sets).
@@ -199,8 +199,8 @@ def preprocess(y,neural_data):
 
 
     print 'Z-scoring Data'
-    X_scaler = StandardScaler().fit(X_flat_valid)
-    y_scaler = StandardScaler().fit(y_valid)
+    X_scaler = StandardScaler().fit(X_flat_train)
+    y_scaler = StandardScaler().fit(y_train)
 
 
     X_flat_train = X_scaler.transform(X_flat_train)
