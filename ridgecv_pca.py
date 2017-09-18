@@ -84,11 +84,11 @@ def load_data(folder,spectrogram=0):
     #time = head_data['time']
 
 
-    #y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
-    #y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
+    y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
+    y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-    y = np.vstack([oz,dz,xyz,theta]).T
-    y_name = ['oz','dz','xyz','theta']
+    #y = np.vstack([oz,dz,xyz,theta]).T
+    #y_name = ['oz','dz','xyz','theta']
 
 
     #lfp_file = np.load('lfp_power.npz')
@@ -101,12 +101,13 @@ def load_data(folder,spectrogram=0):
     print 'Shape of head data = ', y.shape
     print 'Shape of LFP power = ', lfp_power.shape
 
-    for i in range(len(y_name)):
-        y[:,i] = signal.medfilt(y[:,i],[9])
+    #for i in range(len(y_name)):
+    #    y[:,i] = signal.medfilt(y[:,i],[9])
 
-    idx = 1000 #int(y.shape[0]/2)
+    idx = 10000 #int(y.shape[0]/2)
     print 'max idx = ', idx
     return y[0:idx,], lfp_power[0:idx,:],y_name
+    
 
 
 def preprocess(y,neural_data):
@@ -139,6 +140,11 @@ def preprocess(y,neural_data):
     ####### reduce dimensionality of the input data (X) from ~8,000 to 100:
     pca = PCA(n_components=100)
     print 'Reducing Dimensionality with PCA'
+    
+    #pca.fit(X_flat[::10,:])
+
+    #X_flat = pca.transform(X_flat)
+
     X_flat = pca.fit_transform(X_flat)
 
 
@@ -248,7 +254,7 @@ def run_ridge(X_train,X_test,y_train,y_test,y_name):
         plot_results(y_test_item,y_prediction,y_name[head_item],R2)
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,params,model_name='RidgeCV'):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='RidgeCV'):
 
 
     f, axarr = plt.subplots(2,dpi=600)
@@ -262,7 +268,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params,model_name='RidgeCV
     axarr[0].set_xlabel('Time (samples)')
 
 
-    axarr[1].set_title(params)
+    
     axarr[1].scatter(y_valid,y_valid_predicted,alpha=0.05,marker='o')
     #axarr[1].set_title('R2 = ' + str(R2s))
     axarr[1].set_xlabel('Actual')
