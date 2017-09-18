@@ -81,11 +81,11 @@ def load_data(folder,spectrogram=0):
     #time = head_data['time']
 
 
-    #y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
-    #y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
+    y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
+    y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-    y = np.vstack([oz,dz,xyz,theta]).T
-    y_name = ['oz','dz','xyz','theta']
+    #y = np.vstack([oz,dz,xyz,theta]).T
+    #y_name = ['oz','dz','xyz','theta']
 
 
     #lfp_file = np.load('lfp_power.npz')
@@ -101,9 +101,10 @@ def load_data(folder,spectrogram=0):
     for i in range(len(y_name)):
         y[:,i] = signal.medfilt(y[:,i],[9])
 
-    idx = 1000 #int(y.shape[0]/2)
-    print 'max idx = ', idx
-    return y[0:idx,], lfp_power[0:idx,:],y_name
+    #idx = 200 #int(y.shape[0]/2)
+    #print 'max idx = ', idx
+    #return y[0:idx,], lfp_power[0:idx,:],y_name
+    return y, lfp_power,y_name
 
 
 def preprocess(y,neural_data):
@@ -205,8 +206,8 @@ def preprocess(y,neural_data):
     # y_test=y_test-y_train_mean
     # y_valid=y_valid-y_train_mean
 
-    X_scaler = StandardScaler().fit(X_flat_valid)
-    y_scaler = StandardScaler().fit(y_valid)
+    X_scaler = StandardScaler().fit(X_flat_train)
+    y_scaler = StandardScaler().fit(y_train)
 
 
     X_flat_train = X_scaler.transform(X_flat_train)
@@ -233,7 +234,7 @@ def run_SVR(X_train,X_test,y_train,y_test,y_name):
 
     for head_item in range(len(y_name)):
 
-        model_svr = GridSearchCV(SVR(cache_size=1000), cv=5, n_jobs=6,
+        model_svr = GridSearchCV(SVR(cache_size=2000), cv=5, n_jobs=12,
                    param_grid={"C": C_range,   # [1e0, 1e1, 1e2, 1e3]
                                "gamma": gamma_range},)  ##  np.logspace(-2, 2, 5)
     
