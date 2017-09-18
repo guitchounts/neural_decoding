@@ -81,7 +81,7 @@ def load_data(folder,spectrogram=0):
     #time = head_data['time']
 
 
-    y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
+    y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
     y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
     #y = np.vstack([oz,dz,xyz,theta]).T
