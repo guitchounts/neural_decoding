@@ -25,8 +25,7 @@ import matplotlib
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import sys,os
-from scipy import io
-from scipy import stats,signal
+from scipy import stats,signal,io,spatial
 import pickle
 import h5py
 #Import function to get the covariate matrix that includes spike history from previous bins
@@ -46,8 +45,8 @@ from metrics import get_rho
 # from decoders import XGBoostDecoder
 # from decoders import SVRDecoder
 
-
-from sklearn.svm import SVR
+from scipy.interpolate import Rbf
+from sklearn.svm import SVR,LinearSVR
 from sklearn.externals import joblib
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import StandardScaler
@@ -101,7 +100,7 @@ def load_data(folder,spectrogram=0):
     for i in range(len(y_name)):
         y[:,i] = signal.medfilt(y[:,i],[9])
 
-    idx = int(y.shape[0]/2)
+    idx = 1000 # int(y.shape[0]/2)
     print 'max idx = ', idx
     return y[0:idx,], lfp_power[0:idx,:],y_name
     
@@ -219,7 +218,57 @@ def preprocess(y,neural_data):
     return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
 
 # ## 4. Run Decoders
+def rbf_kernel(features,features2):
+    #print features1.shape,features2.shape
+    #print features1[0:10,1]
+    #print features2[0:10,1]
+    #features = np.dot(features1,features2)
+    gamma = 1e-6
+    # features should be matrix of n_samples by n_features (X)
+    k_mat = spatial.distance.squareform(spatial.distance.pdist(features))**2
 
+    return np.exp(-gamma*k_mat)
+
+def run_linearSVR(X_train,X_test,y_train,y_test,y_name):
+    # ### 4D. SVR (Support Vector Regression)
+
+    
+    #Declare model
+    #Fit model
+    
+
+    for head_item in range(len(y_name)):
+
+        #rbfi = Rbf()
+
+        model_svr = SVR(kernel=rbf_kernel)
+
+        ### fit one at a time and save/plot the results 
+        print '########### Fitting SVR on %s data ###########' % y_name[head_item]
+
+        y_train_item = y_train[:,head_item]
+        #y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+        print 'shape of y_train_item = ', y_train_item.shape
+
+        y_test_item = y_test[:,head_item]
+        #y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+
+        model_svr.fit(X_train,y_train_item)
+
+        #Get predictions
+        y_prediction=model_svr.predict(X_test)
+
+        #Get metric of fit
+        R2s_svr=get_R2(y_test_item,y_prediction)
+        print(y_name[head_item], 'R2:', R2s_svr)
+
+        
+        print 'saving prediction ...'
+        np.savez(y_name[head_item] + '_linearSVR_ypredicted.npz',y_test=y_test_item,y_prediction=y_prediction)
+        print 'saving model ...'
+        joblib.dump(model_svr, y_name[head_item] + '_linearSVR.pkl') 
+        print 'plotting results...'
+        plot_results(y_test_item,y_prediction,y_name[head_item],R2s_svr)
 
 def run_SVR(X_train,X_test,y_train,y_test,y_name):
     # ### 4D. SVR (Support Vector Regression)
@@ -234,7 +283,7 @@ def run_SVR(X_train,X_test,y_train,y_test,y_name):
 
     for head_item in range(len(y_name)):
 
-        model_svr = GridSearchCV(SVR(cache_size=1000), cv=5, n_jobs=6,
+        model_svr = GridSearchCV(SVR(cache_size=1000,kernel=rbf_kernel), cv=5, n_jobs=6,
                    param_grid={"C": C_range,   # [1e0, 1e1, 1e2, 1e3]
                                "gamma": gamma_range},)  ##  np.logspace(-2, 2, 5)
     
@@ -269,7 +318,7 @@ def run_SVR(X_train,X_test,y_train,y_test,y_name):
         plot_results(y_test_item,y_prediction,y_name[head_item],R2s_svr,params)
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,params,model_name='SVR'):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
 
 
     f, axarr = plt.subplots(2,dpi=600)
@@ -310,7 +359,7 @@ if __name__ == "__main__":
         data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
     elif model_type == 'svr':
         data_model = run_SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
-    elif model_type == 'rnn':
-        RNN(X_train,y_train,X_valid,y_valid,y_name)
+    elif model_type == 'linearSVR':
+        run_linearSVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
 
    

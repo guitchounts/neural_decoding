@@ -47,7 +47,7 @@ from metrics import get_rho
 # from decoders import SVRDecoder
 
 
-
+from sklearn.model_selection import train_test_split
 from sklearn.decomposition import PCA
 from sklearn import linear_model
 from sklearn.externals import joblib
@@ -101,8 +101,8 @@ def load_data(folder,spectrogram=0):
     print 'Shape of head data = ', y.shape
     print 'Shape of LFP power = ', lfp_power.shape
 
-    #for i in range(len(y_name)):
-    #    y[:,i] = signal.medfilt(y[:,i],[9])
+    for i in range(len(y_name)):
+        y[:,i] = signal.medfilt(y[:,i],[9])
 
     idx = 10000 #int(y.shape[0]/2)
     print 'max idx = ', idx
@@ -147,7 +147,7 @@ def preprocess(y,neural_data):
 
     X_flat = pca.fit_transform(X_flat)
 
-    #X_train, X_test, y_train, y_test = train_test_split(X_flat, y, test_size=0.5, random_state=42)
+    
     # ### 3C. Split into training / testing / validation sets
     # Note that hyperparameters should be determined using a separate validation set. 
     # Then, the goodness of fit should be be tested on a testing set (separate from the training and validation sets).
@@ -158,45 +158,45 @@ def preprocess(y,neural_data):
 
     #Set what part of data should be part of the training/testing/validation sets
     training_range=[0, 0.5]
-    #testing_range=[0.7, 0.85]
+    # #testing_range=[0.7, 0.85]
     valid_range=[0.5,1]
 
 
-    # #### Split Data
+    # # #### Split Data
 
-    # In[81]:
+    # # In[81]:
 
     num_examples=X.shape[0]
 
-    print 'Splitting Data into Training and Testing Sets'
+    # print 'Splitting Data into Training and Testing Sets'
 
-    #Note that each range has a buffer of"bins_before" bins at the beginning, and "bins_after" bins at the end
-    #This makes it so that the different sets don't include overlapping neural data
+    # #Note that each range has a buffer of"bins_before" bins at the beginning, and "bins_after" bins at the end
+    # #This makes it so that the different sets don't include overlapping neural data
     training_set=np.arange(np.int(np.round(training_range[0]*num_examples))+bins_before,np.int(np.round(training_range[1]*num_examples))-bins_after)
-    #testing_set=np.arange(np.int(np.round(testing_range[0]*num_examples))+bins_before,np.int(np.round(testing_range[1]*num_examples))-bins_after)
+    # #testing_set=np.arange(np.int(np.round(testing_range[0]*num_examples))+bins_before,np.int(np.round(testing_range[1]*num_examples))-bins_after)
     valid_set=np.arange(np.int(np.round(valid_range[0]*num_examples))+bins_before,np.int(np.round(valid_range[1]*num_examples))-bins_after)
 
-    #Get training data
-    X_train=X[training_set,:,:]
+    # #Get training data
+    # X_train=X[training_set,:,:]
     X_flat_train=X_flat[training_set,:]
 
 
     y_train=y[training_set,:]
 
-    #Get testing data
-    #X_test=X[testing_set,:,:]
-    #X_flat_test=X_flat[testing_set,:]
+    # #Get testing data
+    # #X_test=X[testing_set,:,:]
+    # #X_flat_test=X_flat[testing_set,:]
 
-    #y_test=y[testing_set,:]
+    # #y_test=y[testing_set,:]
 
-    #Get validation data
-    X_valid=X[valid_set,:,:]
+    # #Get validation data
+    # X_valid=X[valid_set,:,:]
     X_flat_valid=X_flat[valid_set,:]
 
 
     y_valid=y[valid_set,:]
 
-
+    X_flat_train, X_flat_valid, y_train, y_valid = train_test_split(X_flat, y, test_size=0.5,shuffle=False,random_state=42)
 
     print 'Z-scoring Data'
     X_scaler = StandardScaler().fit(X_flat_train)
@@ -209,7 +209,7 @@ def preprocess(y,neural_data):
     X_flat_valid = X_scaler.transform(X_flat_valid)
     y_valid = y_scaler.transform(y_valid)
 
-    return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
+    return X_flat_train,X_flat_valid,y_train,y_valid
 
 # ## 4. Run Decoders
 
@@ -224,7 +224,8 @@ def run_ridge(X_train,X_test,y_train,y_test,y_name):
 
     for head_item in range(len(y_name)):
 
-        ridge_model = linear_model.RidgeCV()
+        ridge_model = linear_model.RidgeCV(alphas=[0.01, 0.1, 1, 10,100])
+        
         ### fit one at a time and save/plot the results 
         print '########### Fitting RidgeCV on %s data ###########' % y_name[head_item]
 
@@ -288,7 +289,7 @@ if __name__ == "__main__":
     print '############################ Running Ridge Regression with Cross Validation ############################'
     head_data,neural_data,y_name = load_data(os.getcwd())
 
-    X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(head_data,neural_data)
+    X_flat_train,X_flat_valid,y_train,y_valid = preprocess(head_data,neural_data)
 
 
     run_ridge(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
