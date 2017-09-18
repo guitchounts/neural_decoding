@@ -234,7 +234,7 @@ def run_SVR(X_train,X_test,y_train,y_test,y_name):
 
     for head_item in range(len(y_name)):
 
-        model_svr = GridSearchCV(SVR(cache_size=2000), cv=5, n_jobs=12,
+        model_svr = GridSearchCV(SVR(cache_size=1000), cv=5, n_jobs=12,
                    param_grid={"C": C_range,   # [1e0, 1e1, 1e2, 1e3]
                                "gamma": gamma_range},)  ##  np.logspace(-2, 2, 5)
     
