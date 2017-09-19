@@ -404,7 +404,7 @@ def GRU():
 
 def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 	# ### 4H. LSTM (Long Short Term Memory)
-
+	print 'head items to fit are: ', y_name
 	# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -413,7 +413,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 
 		y_test_item = y_test[:,head_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-
+		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
 		model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=15)
 
