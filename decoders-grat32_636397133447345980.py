@@ -82,8 +82,8 @@ def load_data(folder,spectrogram=0):
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-	y = np.vstack([oz,dz,xyz,theta]).T
-	y_name = ['oz','dz','xyz','theta']
+	#y = np.vstack([oz,dz,xyz,theta]).T
+	#y_name = ['oz','dz','xyz','theta']
 
 
 	y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
@@ -419,7 +419,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=15)
+		model_lstm=LSTMDecoder(dropout=0,num_epochs=25)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
