@@ -596,9 +596,7 @@ class LSTMDecoder(object):
 
         model.add(Dense(64,activation = 'tanh'))
 
-        model.add(Dense(32,activation = 'relu'))
-
-        #model.add(Dense(2,activation = 'relu'))
+        model.add(Dense(2,activation = 'relu'))
 
 
         #Add dense connections to output layer
