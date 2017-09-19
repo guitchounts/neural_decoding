@@ -591,7 +591,7 @@ class LSTMDecoder(object):
 
         model=Sequential() #Declare model
         #Add recurrent layer
-        model.add(LSTM(self.units,activation='relu',input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
+        model.add(GRU(self.units,activation='tanh',recurrent_activation='hard_sigmoid',input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
 
         model.add(Dense(16,activation = 'relu'))
