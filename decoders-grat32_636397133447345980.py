@@ -158,9 +158,9 @@ def preprocess(jerk,neural_data):
 	# In[32]:
 
 	#Set what part of data should be part of the training/testing/validation sets
-	training_range=[0, 0.5]
+	training_range=[0.2, 1]
 	testing_range=[0.7, 0.85]
-	valid_range=[0.5,1]
+	valid_range=[0,0.2]
 
 
 	# #### Split Data
