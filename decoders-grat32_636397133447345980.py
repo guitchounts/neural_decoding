@@ -53,7 +53,18 @@ from sklearn.preprocessing import StandardScaler
 import seaborn as sns
 sns.set_style('white')
 
-def load_data(folder,spectrogram=0):
+from scipy import stats,signal
+
+def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
+	
+    # design Elliptic filter:
+
+    [b,a] = signal.butter(filt_order,[freq/fs for freq in freq_range],btype=filt_type)
+    
+    filtered_trace = signal.filtfilt(b,a,ephys,axis=0)
+    return filtered_trace
+
+def load_data(folder):
 
 	head_data = h5py.File('all_head_data.hdf5','r')
 	
@@ -101,7 +112,10 @@ def load_data(folder,spectrogram=0):
 	print 'Shape of LFP power = ', lfp_power.shape
 
 	for i in range(len(y_name)):
-		y[:,i] = signal.medfilt(y[:,i],[9])
+		#y[:,i] = signal.medfilt(y[:,i],[9])
+		y[:,i] = filter(y[:,i],[3.],filt_type='lowpass')
+
+
 
 	#idx = 30000 #int(y.shape[0]/2)
 	#print 'max idx = ', idx
@@ -437,7 +451,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=10)
+		model_lstm=LSTMDecoder(dropout=0,num_epochs=5)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
