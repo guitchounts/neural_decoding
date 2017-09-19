@@ -600,7 +600,7 @@ class LSTMDecoder(object):
 
 
         #Add dense connections to output layer
-        model.add(Dense(y_train.shape[1]),activation='relu')
+        model.add(Dense(y_train.shape[1],activation='relu'))
 
         #Fit model (and set fitting parameters)
         model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
