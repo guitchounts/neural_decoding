@@ -113,7 +113,7 @@ def load_data(folder):
 
 	for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
-		y[:,i] = filter(y[:,i],[3.],filt_type='lowpass')
+		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
 
 
 
