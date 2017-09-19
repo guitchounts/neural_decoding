@@ -465,7 +465,7 @@ if __name__ == "__main__":
 	elif model_type == 'svr':
 		data_model = SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
 	elif model_type == 'rnn':
-		RNN(X_train,y_train,X_valid,y_valid,y_name)
+		RNN(X_train,y_train,X_valid,y_valid,y_name,y_name)
 
 	#with open('model_' + model_type + '_rawjerk','wb') as f:
 	#	pickle.dump(data_model,f)
