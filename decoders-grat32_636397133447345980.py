@@ -459,7 +459,7 @@ if __name__ == "__main__":
 
 	
 	if model_type == 'lstm':
-		data_model = run_LSTM(X_train,X_valid,y_train,y_valid)
+		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name)
 	elif model_type == 'wiener':
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 	elif model_type == 'svr':
