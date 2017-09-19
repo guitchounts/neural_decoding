@@ -567,7 +567,7 @@ class LSTMDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=400,dropout=0,num_epochs=10,verbose=1):
+    def __init__(self,units=200,dropout=0,num_epochs=10,verbose=1):
          self.units=units
          self.dropout=dropout
          self.num_epochs=num_epochs
@@ -591,12 +591,12 @@ class LSTMDecoder(object):
 
         model=Sequential() #Declare model
         #Add recurrent layer
-        model.add(Dense(self.units,activation='tanh',input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
+        model.add(GRU(self.units,activation='tanh',return_sequences=True,input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
         # recurrent_activation='hard_sigmoid'
-        model.add(Dense(64,activation='tanh')) #return_sequences=True
+        model.add(GRU(64,activation='tanh')) #return_sequences=True
 
-        #model.add(Dense(2,activation = 'relu'))
+        model.add(Dense(4,activation = 'tanh'))
 
 
         #Add dense connections to output layer
