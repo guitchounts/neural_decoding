@@ -82,12 +82,12 @@ def load_data(folder,spectrogram=0):
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-	#y = np.vstack([oz,dz,xyz,theta]).T
-	#y_name = ['oz','dz','xyz','theta']
+	y = np.vstack([oz,dz,xyz,theta]).T
+	y_name = ['oz','dz','xyz','theta']
 
 
-	y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
-	y_name = ['ox','oy','dx','dy','ax','ay','az']
+	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
+	#y_name = ['ox','oy','dx','dy','ax','ay','az']
 
 
 	#lfp_file = np.load('lfp_power.npz')
@@ -100,13 +100,13 @@ def load_data(folder,spectrogram=0):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of LFP power = ', lfp_power.shape
 
-	for i in range(4):
+	for i in range(len(y_name)):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
-	#idx = 4000 #int(y.shape[0]/2)
-	#print 'max idx = ', idx
-	#return y[0:idx,:], lfp_power[0:idx,:],y_name
-	return y, lfp_power,y_name
+	idx = 30000 #int(y.shape[0]/2)
+	print 'max idx = ', idx
+	return y[0:idx,:], lfp_power[0:idx,:],y_name
+	
 
 def preprocess(jerk,neural_data):
 	# ## 3. Preprocess Data
@@ -419,7 +419,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=25)
+		model_lstm=LSTMDecoder(dropout=0,num_epochs=15)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)

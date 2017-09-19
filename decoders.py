@@ -23,6 +23,7 @@ except ImportError:
 #But if you want to modify the decoders with other functions (e.g. regularization), import them here
 try:
     from keras.models import Sequential
+    frim keras.callbacks import TensorBoard
     from keras.layers import Dense, LSTM, SimpleRNN, GRU, Activation, Dropout
 except ImportError:
     print("\nWARNING: Keras package is not installed. You will be unable to use all neural net decoders")
@@ -594,7 +595,7 @@ class LSTMDecoder(object):
         model.add(GRU(self.units,activation='tanh',return_sequences=True,input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
         # recurrent_activation='hard_sigmoid'
-        model.add(GRU(128,activation='tanh')) #return_sequences=True
+        model.add(GRU(64,activation='tanh')) #return_sequences=True
 
         #model.add(Dense(4,activation = 'tanh'))
 
@@ -605,6 +606,11 @@ class LSTMDecoder(object):
         #Fit model (and set fitting parameters)
         model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
         model.fit(X_train,y_train,nb_epoch=self.num_epochs,verbose=self.verbose) #Fit the model
+
+        model.summary()
+
+        TensorBoard(log_dir='./logs', histogram_freq=1, batch_size=32, write_graph=True, write_grads=False, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+        
         self.model=model
 
 
