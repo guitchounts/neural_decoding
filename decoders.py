@@ -572,7 +572,7 @@ class LSTMDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=10,dropout=0,num_epochs=10,verbose=1):
+    def __init__(self,units=4,dropout=0,num_epochs=10,verbose=1):
          self.units=units
          self.dropout=dropout
          self.num_epochs=num_epochs
@@ -608,7 +608,7 @@ class LSTMDecoder(object):
 
 
         #Add dense connections to output layer
-        model.add(Dense(y_train.shape[1],activation='tanh'))  #,activation='relu' def don't want relu on the output
+        model.add(Dense(y_train.shape[1],activation='relu'))  #,activation='relu' def don't want relu on the output
 
         #Fit model (and set fitting parameters)
         model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
