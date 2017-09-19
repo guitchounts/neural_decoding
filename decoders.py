@@ -567,7 +567,7 @@ class LSTMDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=100,dropout=0,num_epochs=1000,verbose=1):
+    def __init__(self,units=1200,dropout=0,num_epochs=1000,verbose=1):
          self.units=units
          self.dropout=dropout
          self.num_epochs=num_epochs
@@ -594,7 +594,7 @@ class LSTMDecoder(object):
         model.add(LSTM(self.units,activation='linear',recurrent_activation='tanh',input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
 
-        model.add(Dense(64,activation = 'tanh'))
+        model.add(Dense(4,activation = 'tanh'))
 
         model.add(Dense(2,activation = 'relu'))
 
