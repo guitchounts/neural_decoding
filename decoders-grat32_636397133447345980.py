@@ -396,7 +396,7 @@ def GRU():
 	R2s_gru=get_R2(y_valid,y_valid_predicted_gru)
 	print('R2s:', R2s_gru)
 
-def run_LSTM(X_train,X_valid,y_train,y_valid,y_name):
+def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 	# ### 4H. LSTM (Long Short Term Memory)
 
 	# In[ ]:
