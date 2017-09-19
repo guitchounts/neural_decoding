@@ -311,7 +311,7 @@ class DenseNNDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=400,dropout=0,num_epochs=10,verbose=0):
+    def __init__(self,units=400,dropout=0,num_epochs=15,verbose=0):
          self.dropout=dropout
          self.num_epochs=num_epochs
          self.verbose=verbose

@@ -335,23 +335,40 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 
 		plot_results(y_zscore_valid_item,y_zscore_valid_predicted_svr,y_name[head_item],R2s_svr)
 
-def DNN():
+def DNN(X_train,X_valid,y_train,y_test,y_name):
 	# ### 4E. Dense Neural Network
 
+	
+	print 'head items to fit are: ', y_name
 	# In[ ]:
+	for head_item in range(len(y_name)):
 
-	#Declare model
-	model_dnn=DenseNNDecoder(units=400,dropout=0.25,num_epochs=10)
+		y_train_item = y_train[:,head_item]
+		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
 
-	#Fit model
-	model_dnn.fit(X_flat_train,y_train)
+		y_test_item = y_test[:,head_item]
+		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+		print '********************************** Fitting DNN on %s Data **********************************' % y_name[head_item]
+		#Declare model
+		model_dnn=DenseNNDecoder(units=[64,32,16],num_epochs=15)
 
-	#Get predictions
-	y_valid_predicted_dnn=model_dnn.predict(X_flat_valid)
+		#Fit model
+		model_dnn.fit(X_train,y_train_item)
 
-	#Get metric of fit
-	R2s_dnn=get_R2(y_valid,y_valid_predicted_dnn)
-	print('R2s:', R2s_dnn)
+		#Get predictions
+		y_valid_predicted=model_dnn.predict(X_valid)
+
+		#Get metric of fit
+		R2s=get_R2(y_test_item,y_valid_predicted)
+		print('R2s:', R2s)
+		print 'saving prediction ...'
+		np.savez(y_name[head_item] + '_DNN_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted)
+		#print 'saving model ...'
+		#joblib.dump(model_dnn, y_name[head_item] + '_LSTM.pkl') 
+		print 'plotting results...'
+		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='DNN')
+
+	return model_dnn
 
 def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	model_name = 'RNN'
@@ -483,6 +500,9 @@ if __name__ == "__main__":
 		data_model = SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
 	elif model_type == 'rnn':
 		RNN(X_train,y_train,X_valid,y_valid,y_name,y_name)
+	elif model_type == 'dnn':
+		data_model = DNN(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
+	
 
 	#with open('model_' + model_type + '_rawjerk','wb') as f:
 	#	pickle.dump(data_model,f)
