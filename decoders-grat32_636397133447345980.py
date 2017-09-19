@@ -66,7 +66,7 @@ def load_data(folder,spectrogram=0):
 	ax = head_data['ax'][:]
 	az = head_data['az'][:]
 
-	xy = np.sqrt(ax**2 + ay**2)
+	xyz = np.sqrt(ax**2 + ay**2 + az**2)
 
 	theta = np.rad2deg(np.arctan(ax/ay))
 
@@ -76,11 +76,11 @@ def load_data(folder,spectrogram=0):
 	#time = head_data['time']
 
 
-	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xy_acc,theta]).T
-	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xy','theta']
+	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
+	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-	y = np.vstack([oz,dz,xy,theta]).T
-	y_name = ['oz','dz','xy','theta']
+	y = np.vstack([oz,dz,xyz,theta]).T
+	y_name = ['oz','dz','xyz','theta']
 
 
 	#lfp_file = np.load('lfp_power.npz')
@@ -98,7 +98,7 @@ def load_data(folder,spectrogram=0):
 
 	idx = 2000 #int(y.shape[0]/2)
 	print 'max idx = ', idx
-	return y[0:idx,], lfp_power[0:idx,:],y_name
+	return y[0:idx,:], lfp_power[0:idx,:],y_name
 
 
 def preprocess(jerk,neural_data):
@@ -401,11 +401,18 @@ def run_LSTM(X_train,X_valid,y_train,y_valid,y_name):
 
 	# In[ ]:
 	for head_item in range(len(y_name)):
+
+		y_train_item = y_train[:,head_item]
+		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+
+		y_test_item = y_test[:,head_item]
+		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+
 		#Declare model
 		model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=5)
 
 		#Fit model
-		model_lstm.fit(X_train,y_train[head_item])
+		model_lstm.fit(X_train,y_train_item)
 
 		#Get predictions
 		y_valid_predicted_lstm=model_lstm.predict(X_valid)
