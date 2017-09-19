@@ -437,7 +437,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=1)
+		model_lstm=LSTMDecoder(dropout=0,num_epochs=5)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
