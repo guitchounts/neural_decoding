@@ -82,12 +82,12 @@ def load_data(folder,spectrogram=0):
 	#y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
 	#y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-	y = np.vstack([oz,dz,xyz,theta]).T
-	y_name = ['oz','dz','xyz','theta']
+	#y = np.vstack([oz,dz,xyz,theta]).T
+	#y_name = ['oz','dz','xyz','theta']
 
 
-	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
-	#y_name = ['ox','oy','dx','dy','ax','ay','az']
+	y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
+	y_name = ['ox','oy','dx','dy','ax','ay','az']
 
 
 	#lfp_file = np.load('lfp_power.npz')
@@ -158,9 +158,9 @@ def preprocess(jerk,neural_data):
 	# In[32]:
 
 	#Set what part of data should be part of the training/testing/validation sets
-	training_range=[0.2, 1]
+	training_range=[0, 0.5]
 	testing_range=[0.7, 0.85]
-	valid_range=[0,0.2]
+	valid_range=[0.5,1]
 
 
 	# #### Split Data
