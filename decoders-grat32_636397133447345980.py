@@ -350,7 +350,7 @@ def DNN(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting DNN on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_dnn=DenseNNDecoder(units=[64,32,16],num_epochs=15)
+		model_dnn=DenseNNDecoder(units=[128,64,32],num_epochs=15)
 
 		#Fit model
 		model_dnn.fit(X_train,y_train_item)

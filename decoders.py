@@ -311,7 +311,7 @@ class DenseNNDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=400,dropout=0,num_epochs=15,verbose=0):
+    def __init__(self,units=400,dropout=0,num_epochs=15,verbose=1):
          self.dropout=dropout
          self.num_epochs=num_epochs
          self.verbose=verbose
@@ -445,6 +445,10 @@ class SimpleRNNDecoder(object):
         model.fit(X_train,y_train,nb_epoch=self.num_epochs,verbose=self.verbose) #Fit the model
         self.model=model
 
+        model.summary()
+
+        TensorBoard(log_dir='./logs', histogram_freq=1, batch_size=32, write_graph=True, write_grads=False, write_images=False, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None)
+        
 
     def predict(self,X_test):
 
