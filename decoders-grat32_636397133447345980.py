@@ -436,13 +436,19 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=15)
+		model_lstm=LSTMDecoder(dropout=0,num_epochs=1)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
 
 		#Get predictions
 		y_valid_predicted_lstm=model_lstm.predict(X_valid)
+
+
+		training_prediction=model_lstm.predict(X_train)
+
+		R2s_training=get_R2(y_train_item,training_prediction)
+		print 'R2 on training set = ', R2s_training
 
 		#Get metric of fit
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
