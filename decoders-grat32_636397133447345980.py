@@ -98,7 +98,7 @@ def load_data(folder,spectrogram=0):
 	for i in range(4):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
-	idx = 2000 #int(y.shape[0]/2)
+	idx = 4000 #int(y.shape[0]/2)
 	print 'max idx = ', idx
 	return y[0:idx,:], lfp_power[0:idx,:],y_name
 
@@ -111,9 +111,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=25 #How many bins of neural data prior to the output are used for decoding
+	bins_before=10 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=25 #How many bins of neural data after the output are used for decoding
+	bins_after=10 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
@@ -424,8 +424,8 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		print('R2s:', R2s_lstm)
 		print 'saving prediction ...'
 		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm)
-		print 'saving model ...'
-		joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
+		#print 'saving model ...'
+		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
 		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM')
 
