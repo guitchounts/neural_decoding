@@ -197,39 +197,34 @@ def preprocess(jerk,neural_data):
 
 	# In[ ]:
 
-	X_scaler = StandardScaler().fit(X_train)
-	y_scaler = StandardScaler().fit(y_train)
 
-
-	X_train = X_scaler.transform(X_train)
-	y_train = y_scaler.transform(y_train)
-
-	X_valid = X_scaler.transform(X_valid)
-	y_valid = y_scaler.transform(y_valid)
 
 
 	# In[82]:
 
 	#Z-score "X" inputs. 
-	#X_train_mean=np.nanmean(X_train,axis=0)
-	#X_train_std=np.nanstd(X_train,axis=0)
-	# X_train=(X_train-X_train_mean)/X_train_std
-	# X_test=(X_test-X_train_mean)/X_train_std
-	# X_valid=(X_valid-X_train_mean)/X_train_std
+	X_train_mean=np.nanmean(X_train,axis=0)
+	X_train_std=np.nanstd(X_train,axis=0)
+	X_train=(X_train-X_train_mean)/X_train_std
+	X_test=(X_test-X_train_mean)/X_train_std
+	X_valid=(X_valid-X_train_mean)/X_train_std
 
 
-	# #Z-score "X_flat" inputs. 
-	# X_flat_train_mean=np.nanmean(X_flat_train,axis=0)
-	# X_flat_train_std=np.nanstd(X_flat_train,axis=0)
-	# X_flat_train=(X_flat_train-X_flat_train_mean)/X_flat_train_std
-	# X_flat_test=(X_flat_test-X_flat_train_mean)/X_flat_train_std
-	# X_flat_valid=(X_flat_valid-X_flat_train_mean)/X_flat_train_std
+	#Z-score "X_flat" inputs. 
+	X_flat_train_mean=np.nanmean(X_flat_train,axis=0)
+	X_flat_train_std=np.nanstd(X_flat_train,axis=0)
+	X_flat_train=(X_flat_train-X_flat_train_mean)/X_flat_train_std
+	X_flat_test=(X_flat_test-X_flat_train_mean)/X_flat_train_std
+	X_flat_valid=(X_flat_valid-X_flat_train_mean)/X_flat_train_std
 
-	# #Zero-center outputs
-	# y_train_mean=np.mean(y_train,axis=0)
-	# y_train=y_train-y_train_mean
-	# y_test=y_test-y_train_mean
-	# y_valid=y_valid-y_train_mean
+	#Z-score  outputs
+	y_train_mean=np.mean(y_train,axis=0)
+
+	y_train_std=np.nanstd(y_train,axis=0)
+
+	y_train=(y_train-y_train_mean)/y_train_std
+	y_test=(y_test-y_train_mean)/y_train_std
+	y_valid=(y_valid-y_train_mean)/y_train_std
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
 
