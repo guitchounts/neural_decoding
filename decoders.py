@@ -594,13 +594,13 @@ class LSTMDecoder(object):
         model.add(GRU(self.units,activation='tanh',recurrent_activation='hard_sigmoid',input_shape=(X_train.shape[1],X_train.shape[2]),dropout_W=self.dropout,dropout_U=self.dropout)) #Within recurrent layer, include dropout
         if self.dropout!=0: model.add(Dropout(self.dropout)) #Dropout some units (recurrent layer output units)
 
-        model.add(Dense(64,activation='relu')) #return_sequences=True
+        model.add(Dense(64,activation='tanh')) #return_sequences=True
 
         #model.add(Dense(2,activation = 'relu'))
 
 
         #Add dense connections to output layer
-        model.add(Dense(y_train.shape[1]))
+        model.add(Dense(y_train.shape[1]),activation='relu')
 
         #Fit model (and set fitting parameters)
         model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
