@@ -433,7 +433,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		print 'plotting results...'
 		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM')
 
-		return model_lstm
+	return model_lstm
 
 
 def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
