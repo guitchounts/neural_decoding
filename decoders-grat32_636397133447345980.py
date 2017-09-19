@@ -103,9 +103,10 @@ def load_data(folder,spectrogram=0):
 	for i in range(len(y_name)):
 		y[:,i] = signal.medfilt(y[:,i],[9])
 
-	idx = 30000 #int(y.shape[0]/2)
-	print 'max idx = ', idx
-	return y[0:idx,:], lfp_power[0:idx,:],y_name
+	#idx = 30000 #int(y.shape[0]/2)
+	#print 'max idx = ', idx
+	#return y[0:idx,:], lfp_power[0:idx,:],y_name
+	return y, lfp_power,y_name
 	
 
 def preprocess(jerk,neural_data):
