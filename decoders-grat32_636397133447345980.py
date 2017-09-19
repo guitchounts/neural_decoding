@@ -396,50 +396,54 @@ def GRU():
 	R2s_gru=get_R2(y_valid,y_valid_predicted_gru)
 	print('R2s:', R2s_gru)
 
-def run_LSTM(X_train,X_valid,y_train,y_valid):
+def run_LSTM(X_train,X_valid,y_train,y_valid,y_name):
 	# ### 4H. LSTM (Long Short Term Memory)
 
 	# In[ ]:
+	for head_item in range(len(y_name)):
+		#Declare model
+		model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=5)
 
-	#Declare model
-	model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=5)
+		#Fit model
+		model_lstm.fit(X_train,y_train[head_item])
 
-	#Fit model
-	model_lstm.fit(X_train,y_train)
+		#Get predictions
+		y_valid_predicted_lstm=model_lstm.predict(X_valid)
 
-	#Get predictions
-	y_valid_predicted_lstm=model_lstm.predict(X_valid)
+		#Get metric of fit
+		R2s_lstm=get_R2(y_valid[head_item],y_valid_predicted_lstm)
+		print('R2s:', R2s_lstm)
+		print 'saving prediction ...'
+        np.savez(y_name[head_item] + '_linearSVR_ypredicted.npz',y_test=y_test_item,y_prediction=y_prediction)
+        print 'saving model ...'
+        joblib.dump(model_svr, y_name[head_item] + '_linearSVR.pkl') 
+        print 'plotting results...'
+        plot_results(y_test_item,y_prediction,y_name[head_item],R2s_svr,model_name='LSTM')
 
-	#Get metric of fit
-	R2s_lstm=get_R2(y_valid,y_valid_predicted_lstm)
-	print('R2s:', R2s_lstm)
-
-	plot_results(y_valid,y_valid_predicted_lstm)
-
-	return model_lstm
-
-
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='SVR'):
-
-
-	f, axarr = plt.subplots(2,dpi=600)
-	axarr[0].set_title(model_name +' Model of %s. R^2 = %f ' % (y_name,R2s))
+		return model_lstm
 
 
-	axarr[0].plot(y_valid,linewidth=0.1)
-	axarr[0].set_ylabel('Head Data')
-
-	axarr[0].plot(y_valid_predicted,linewidth=0.1,color='red')
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
 
 
-	axarr[1].scatter(y_valid,y_valid_predicted,alpha=0.05,marker='o')
-	#axarr[1].set_title('R2 = ' + str(R2s))
-	axarr[1].set_xlabel('Actual')
-	axarr[1].set_ylabel('Predicted')
-	axarr[1].axis('equal')
+    f, axarr = plt.subplots(2,dpi=600)
+    axarr[0].set_title(model_name +' Model of %s. R^2 = %f ' % (y_name,R2s))
 
-	sns.despine(left=True,bottom=True)
-	f.savefig(model_name + '_%s.pdf' % y_name)
+
+    axarr[0].plot(y_valid,linewidth=0.1)
+    axarr[0].set_ylabel('Head Data')
+
+    axarr[0].plot(y_valid_predicted,linewidth=0.1,color='red')
+
+    axarr[1].set_title(params)
+    axarr[1].scatter(y_valid,y_valid_predicted,alpha=0.05,marker='o')
+    #axarr[1].set_title('R2 = ' + str(R2s))
+    axarr[1].set_xlabel('Actual')
+    axarr[1].set_ylabel('Predicted')
+    axarr[1].axis('equal')
+
+    sns.despine(left=True,bottom=True)
+    f.savefig(model_name + '_%s.pdf' % y_name)
 
 
 

@@ -80,11 +80,11 @@ def load_data(folder,spectrogram=0):
     #time = head_data['time']
 
 
-    y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
-    y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
+    #y = np.vstack([dx,dy,dz,ax,ay,az,ox,oy,oz,xyz,theta]).T
+    #y_name = ['dx','dy','dz','ax','ay','az','ox','oy','oz','xyz','theta']
 
-    #y = np.vstack([oz,dz,xyz,theta]).T
-    #y_name = ['oz','dz','xyz','theta']
+    y = np.vstack([oz,dz,xyz,theta]).T
+    y_name = ['oz','dz','xyz','theta']
 
 
     #lfp_file = np.load('lfp_power.npz')
@@ -100,9 +100,9 @@ def load_data(folder,spectrogram=0):
     for i in range(len(y_name)):
         y[:,i] = signal.medfilt(y[:,i],[9])
 
-    idx = 1000 # int(y.shape[0]/2)
+    idx = 10000 # int(y.shape[0]/2)
     print 'max idx = ', idx
-    return y[0:idx,], lfp_power[0:idx,:],y_name
+    return y[0:idx,:], lfp_power[0:idx,:],y_name
     
 
 
@@ -114,9 +114,9 @@ def preprocess(y,neural_data):
 
     # In[25]:
 
-    bins_before=25 #How many bins of neural data prior to the output are used for decoding
+    bins_before=10 #How many bins of neural data prior to the output are used for decoding
     bins_current=1 #Whether to use concurrent time bin of neural data
-    bins_after=25 #How many bins of neural data after the output are used for decoding
+    bins_after=10 #How many bins of neural data after the output are used for decoding
 
 
     # ### 3B. Format Covariates
@@ -228,6 +228,7 @@ def rbf_kernel(features,features2):
     k_mat = spatial.distance.squareform(spatial.distance.pdist(features))**2
 
     return np.exp(-gamma*k_mat)
+
 
 def run_linearSVR(X_train,X_test,y_train,y_test,y_name):
     # ### 4D. SVR (Support Vector Regression)
