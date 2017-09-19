@@ -86,6 +86,10 @@ def load_data(folder,spectrogram=0):
 	y_name = ['oz','dz','xyz','theta']
 
 
+	y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
+	y_name = ['ox','oy','dx','dy','ax','ay','az']
+
+
 	#lfp_file = np.load('lfp_power.npz')
 	lfp_file = h5py.File('lfp_power.hdf5','r')
 
