@@ -409,7 +409,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 
 		#Declare model
-		model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=5)
+		model_lstm=LSTMDecoder(units=400,dropout=0,num_epochs=15)
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
@@ -421,11 +421,11 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
 		print('R2s:', R2s_lstm)
 		print 'saving prediction ...'
-		np.savez(y_name[head_item] + '_linearSVR_ypredicted.npz',y_test=y_test_item,y_prediction=y_prediction)
+		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm)
 		print 'saving model ...'
-		joblib.dump(model_svr, y_name[head_item] + '_linearSVR.pkl') 
+		joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
-		plot_results(y_test_item,y_prediction,y_name[head_item],R2s_svr,model_name='LSTM')
+		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM')
 
 		return model_lstm
 
