@@ -23,7 +23,7 @@ except ImportError:
 #But if you want to modify the decoders with other functions (e.g. regularization), import them here
 try:
     from keras.models import Sequential
-    frim keras.callbacks import TensorBoard
+    from keras.callbacks import TensorBoard
     from keras.layers import Dense, LSTM, SimpleRNN, GRU, Activation, Dropout
 except ImportError:
     print("\nWARNING: Keras package is not installed. You will be unable to use all neural net decoders")
