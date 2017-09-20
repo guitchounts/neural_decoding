@@ -37,7 +37,7 @@ def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute y
       
     mod_square =  K.square(K.abs(y_pred - y_true) - 360.)
     raw_square =  K.square(y_pred - y_true)
-    better = K.minimum(mod_square,raw_square,axis=0)
+    better = K.minimum(mod_square,raw_square)
     return K.mean(better,axis=-1)
 
 ##################### DECODER FUNCTIONS ##########################
