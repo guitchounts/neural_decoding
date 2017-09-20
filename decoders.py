@@ -36,8 +36,8 @@ except ImportError:
 def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute yaw data (0-360 values wrap around)
     
 
-    y_true = y_true * y_train_std + y_train_mean ### y_train_mean,y_train_std are GLOBALS ??? 
-    y_pred = y_pred * y_train_std + y_train_mean
+    y_true = y_true * y_std + y_mean ### y_train_mean,y_train_std are GLOBALS ??? 
+    y_pred = y_pred * y_std + y_mean
 
     mod_square =  K.square(K.abs(y_pred - y_true) - 360) ### hack 2.1 = (360 - np.mean(ox)) / np.std(ox) 2.1086953197291871
     raw_square =  K.square(y_pred - y_true)
@@ -593,8 +593,10 @@ class LSTMDecoder(object):
 
 
     def get_means(y_train_mean,y_train_std):
-        global y_train_mean
-        global y_train_std
+        y_mean = y_train_mean
+        y_std = y_train_std
+        global y_mean
+        global y_std
 
     def fit(self,X_train,y_train):
 
