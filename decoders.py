@@ -633,7 +633,7 @@ class LSTMDecoder(object):
         model.add(Dense(y_train.shape[1]))  #,activation='relu' def don't want relu on the output
 
         #Fit model (and set fitting parameters)
-        model.compile(loss=modified_mse,optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
+        model.compile(loss='mean_squared_error',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
         model.fit(X_train,y_train,nb_epoch=self.num_epochs,verbose=self.verbose) #Fit the model
 
         model.summary()
