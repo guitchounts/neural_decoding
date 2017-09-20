@@ -35,7 +35,7 @@ except ImportError:
 
 def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute yaw data (0-360 values wrap around)
       
-    one =  K.mean(K.square(K.abs(y_pred - y_true) - 360), axis=-1)
+    one =  K.mean(K.square(K.abs(y_pred - y_true) - 360.), axis=-1)
     two =  K.mean(K.square(y_pred - y_true), axis=-1)
     return K.min(one,two)
 
