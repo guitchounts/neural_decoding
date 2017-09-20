@@ -114,14 +114,14 @@ def load_data(folder):
 
 	for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
-		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
+		y[:,i] = filter(y[:,i],[3.],filt_type='lowpass')
 
 
 
-	#idx = 30000 #int(y.shape[0]/2)
-	#print 'max idx = ', idx
-	#return y[0:idx,:], lfp_power[0:idx,:],y_name
-	return y, lfp_power,y_name
+	idx = int(y.shape[0]/2)
+	print 'max idx = ', idx
+	return y[0:idx,:], lfp_power[0:idx,:],y_name
+	
 	
 
 def preprocess(jerk,neural_data):
