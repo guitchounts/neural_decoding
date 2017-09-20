@@ -241,11 +241,13 @@ def preprocess(jerk,neural_data):
 
 	y_train_std=np.nanstd(y_train,axis=0)
 
-	y_train=(y_train-y_train_mean)/y_train_std
-	y_test=(y_test-y_train_mean)/y_train_std
-	y_valid=(y_valid-y_train_mean)/y_train_std
 
-	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
+	#### 
+	#y_train=(y_train-y_train_mean)/y_train_std
+	#y_test=(y_test-y_train_mean)/y_train_std
+	#y_valid=(y_valid-y_train_mean)/y_train_std
+
+	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 
 # ## 4. Run Decoders
 
@@ -438,7 +440,7 @@ def GRU():
 	R2s_gru=get_R2(y_valid,y_valid_predicted_gru)
 	print('R2s:', R2s_gru)
 
-def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
+def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 	# ### 4H. LSTM (Long Short Term Memory)
 	print 'head items to fit are: ', y_name
 	# In[ ]:
@@ -469,7 +471,9 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
 		print('R2s:', R2s_lstm)
 		print 'saving prediction ...'
-		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm)
+		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
+			y_train_=y_train_item,training_prediction=training_prediction,
+			y_train_mean=y_train_mean,y_train_std=y_train_std)
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
@@ -510,11 +514,11 @@ if __name__ == "__main__":
 
 	head_data,neural_data,y_name = load_data(os.getcwd())
 
-	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(head_data,neural_data)
+	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 
 	
 	if model_type == 'lstm':
-		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name)
+		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	elif model_type == 'wiener':
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 	elif model_type == 'svr':
