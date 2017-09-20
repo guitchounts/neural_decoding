@@ -55,6 +55,7 @@ sns.set_style('white')
 
 from scipy import stats,signal
 
+
 def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
 	
     # design Elliptic filter:
@@ -455,6 +456,8 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		#Declare model
 		model_lstm=LSTMDecoder(dropout=0,num_epochs=5)
 
+		model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
+
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
 
@@ -486,7 +489,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
 
 
     f, axarr = plt.subplots(2,dpi=600)
-    axarr[0].set_title(model_name +' Model of %s. R^2 = %f ' % (y_name,R2s))
+    axarr[0].set_title(model_name +' Model of %s. R^2 = %f. r = %f ' % (y_name,R2s,stats.pearsonr(y_valid,y_valid_predicted) ))
 
 
     axarr[0].plot(y_valid,linewidth=0.1)
