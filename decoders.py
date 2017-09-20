@@ -592,11 +592,14 @@ class LSTMDecoder(object):
          self.verbose=verbose
 
 
-    def get_means(y_train_mean,y_train_std):
-        y_mean = y_train_mean
-        y_std = y_train_std
+    def get_means(self,y_train_mean,y_train_std):
+        
         global y_mean
         global y_std
+
+        y_mean = y_train_mean
+        y_std = y_train_std
+        
 
     def fit(self,X_train,y_train):
 
