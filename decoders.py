@@ -25,6 +25,7 @@ try:
     from keras.models import Sequential
     from keras.callbacks import TensorBoard
     from keras.layers import Dense, LSTM, SimpleRNN, GRU, Activation, Dropout
+    import keras.backend as K
 except ImportError:
     print("\nWARNING: Keras package is not installed. You will be unable to use all neural net decoders")
     pass
@@ -578,6 +579,12 @@ class LSTMDecoder(object):
          self.num_epochs=num_epochs
          self.verbose=verbose
 
+    def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute yaw data (0-360 values wrap around)
+          
+        one =  K.mean(K.square(K.abs(y_pred - y_true) - 360), axis=-1)
+        two =  K.mean(K.square(y_pred - y_true), axis=-1)
+        return K.min(one,two)
+
 
     def fit(self,X_train,y_train):
 
@@ -611,7 +618,7 @@ class LSTMDecoder(object):
         model.add(Dense(y_train.shape[1]))  #,activation='relu' def don't want relu on the output
 
         #Fit model (and set fitting parameters)
-        model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
+        model.compile(loss=modified_mse,optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
         model.fit(X_train,y_train,nb_epoch=self.num_epochs,verbose=self.verbose) #Fit the model
 
         model.summary()
