@@ -91,11 +91,11 @@ def load_data(folder):
 	#time = head_data['time']
 
 
-	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
-	y = np.vstack([ox]).T
-	y_name = ['ox']
+	#y = np.vstack([ox]).T
+	#y_name = ['ox']
 
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
@@ -118,9 +118,10 @@ def load_data(folder):
 
 
 
-	idx = int(y.shape[0]/2)
-	print 'max idx = ', idx
-	return y[0:idx,:], lfp_power[0:idx,:],y_name
+	#idx = int(y.shape[0]/2)
+	#print 'max idx = ', idx
+	#return y[0:idx,:], lfp_power[0:idx,:],y_name
+	return y, lfp_power,y_name
 	
 	
 
@@ -173,9 +174,9 @@ def preprocess(jerk,neural_data):
 	# In[32]:
 
 	#Set what part of data should be part of the training/testing/validation sets
-	training_range=[0, 0.5]
+	training_range=[0.2, 1]
 	testing_range=[0.7, 0.85]
-	valid_range=[0.5,1]
+	valid_range=[0 0.2]
 
 
 	# #### Split Data
