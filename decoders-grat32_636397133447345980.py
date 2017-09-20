@@ -243,9 +243,9 @@ def preprocess(jerk,neural_data):
 
 
 	#### 
-	#y_train=(y_train-y_train_mean)/y_train_std
-	#y_test=(y_test-y_train_mean)/y_train_std
-	#y_valid=(y_valid-y_train_mean)/y_train_std
+	y_train=(y_train-y_train_mean)/y_train_std
+	y_test=(y_test-y_train_mean)/y_train_std
+	y_valid=(y_valid-y_train_mean)/y_train_std
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 

@@ -35,7 +35,7 @@ except ImportError:
 
 def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute yaw data (0-360 values wrap around)
       
-    mod_square =  K.square(K.abs(y_pred - y_true) - 360.)
+    mod_square =  K.square(K.abs(y_pred - y_true) - 2.1086953197291871.)
     raw_square =  K.square(y_pred - y_true)
     better = K.minimum(mod_square,raw_square)
     print 'shape of mod squares = ', K.int_shape(mod_square)
