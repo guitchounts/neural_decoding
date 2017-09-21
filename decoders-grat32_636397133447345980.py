@@ -477,7 +477,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		print 'saving prediction ...'
 		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
 			y_train_=y_train_item,training_prediction=training_prediction,
-			y_train_mean=y_train_mean,y_train_std=y_train_std)
+			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
