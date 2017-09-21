@@ -91,11 +91,11 @@ def load_data(folder):
 	#time = head_data['time']
 
 
-	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
-	#y = np.vstack([oz]).T
-	#y_name = ['oz']
+	y = np.vstack([ox]).T
+	y_name = ['ox']
 
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
