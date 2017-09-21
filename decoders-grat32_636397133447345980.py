@@ -97,6 +97,7 @@ def load_data(folder):
 	y = np.vstack([ox]).T
 	y_name = ['ox']
 
+	y = filter(np.rad2deg( np.unwrap( np.deg2rad(   y) ) ),[0.001],filt_type='highpass',fs=10)
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
 	#y_name = ['ox','oy','dx','dy','ax','ay','az']
@@ -112,9 +113,9 @@ def load_data(folder):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of LFP power = ', lfp_power.shape
 
-	for i in range(len(y_name)):
+	#for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
-		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
+	#	y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
 
 
 
