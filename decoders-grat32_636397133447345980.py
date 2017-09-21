@@ -457,7 +457,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		#Declare model
 		model_lstm=LSTMDecoder(dropout=0.25,num_epochs=5)
 
-		#model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
+		model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
