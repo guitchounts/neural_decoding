@@ -55,6 +55,7 @@ sns.set_style('white')
 
 from scipy import stats,signal
 
+
 def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
 	
     # design Elliptic filter:
@@ -93,8 +94,8 @@ def load_data(folder):
 	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
 	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
-	#y = np.vstack([oz,dz,xyz,theta]).T
-	#y_name = ['oz','dz','xyz','theta']
+	#y = np.vstack([oz]).T
+	#y_name = ['oz']
 
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
@@ -117,10 +118,11 @@ def load_data(folder):
 
 
 
-	#idx = 30000 #int(y.shape[0]/2)
+	#idx = int(y.shape[0]/2)
 	#print 'max idx = ', idx
 	#return y[0:idx,:], lfp_power[0:idx,:],y_name
 	return y, lfp_power,y_name
+	
 	
 
 def preprocess(jerk,neural_data):
@@ -172,9 +174,9 @@ def preprocess(jerk,neural_data):
 	# In[32]:
 
 	#Set what part of data should be part of the training/testing/validation sets
-	training_range=[0, 0.5]
+	training_range=[0.2, 1]
 	testing_range=[0.7, 0.85]
-	valid_range=[0.5,1]
+	valid_range=[0, 0.2]
 
 
 	# #### Split Data
@@ -241,11 +243,13 @@ def preprocess(jerk,neural_data):
 
 	y_train_std=np.nanstd(y_train,axis=0)
 
+
+	#### 
 	y_train=(y_train-y_train_mean)/y_train_std
 	y_test=(y_test-y_train_mean)/y_train_std
 	y_valid=(y_valid-y_train_mean)/y_train_std
 
-	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid
+	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 
 # ## 4. Run Decoders
 
@@ -438,7 +442,7 @@ def GRU():
 	R2s_gru=get_R2(y_valid,y_valid_predicted_gru)
 	print('R2s:', R2s_gru)
 
-def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
+def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 	# ### 4H. LSTM (Long Short Term Memory)
 	print 'head items to fit are: ', y_name
 	# In[ ]:
@@ -451,7 +455,9 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=5)
+		model_lstm=LSTMDecoder(dropout=0.25,num_epochs=5)
+
+		#model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
 
 		#Fit model
 		model_lstm.fit(X_train,y_train_item)
@@ -469,7 +475,9 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name):
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
 		print('R2s:', R2s_lstm)
 		print 'saving prediction ...'
-		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm)
+		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
+			y_train_=y_train_item,training_prediction=training_prediction,
+			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
@@ -482,7 +490,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
 
 
     f, axarr = plt.subplots(2,dpi=600)
-    axarr[0].set_title(model_name +' Model of %s. R^2 = %f ' % (y_name,R2s))
+    axarr[0].set_title(model_name +' Model of %s. R^2 = %f. r = %f ' % (y_name,R2s,stats.pearsonr(y_valid,y_valid_predicted)[0] ))
 
 
     axarr[0].plot(y_valid,linewidth=0.1)
@@ -510,11 +518,11 @@ if __name__ == "__main__":
 
 	head_data,neural_data,y_name = load_data(os.getcwd())
 
-	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid = preprocess(head_data,neural_data)
+	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 
 	
 	if model_type == 'lstm':
-		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name)
+		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	elif model_type == 'wiener':
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 	elif model_type == 'svr':

@@ -25,11 +25,24 @@ try:
     from keras.models import Sequential
     from keras.callbacks import TensorBoard
     from keras.layers import Dense, LSTM, SimpleRNN, GRU, Activation, Dropout
+    import keras.backend as K
 except ImportError:
     print("\nWARNING: Keras package is not installed. You will be unable to use all neural net decoders")
     pass
 
 
+
+
+def modified_mse(y_true, y_pred): #### modified MSE loss function for absolute yaw data (0-360 values wrap around)
+    
+
+    y_true = y_true * y_std + y_mean ### y_train_mean,y_train_std are GLOBALS ??? 
+    y_pred = y_pred * y_std + y_mean
+
+    mod_square =  K.square(K.abs(y_pred - y_true) - 360) ### hack 2.1 = (360 - np.mean(ox)) / np.std(ox) 2.1086953197291871
+    raw_square =  K.square(y_pred - y_true)
+    better = K.minimum(mod_square,raw_square)
+    return K.mean(better,axis=-1)
 
 ##################### DECODER FUNCTIONS ##########################
 
@@ -572,12 +585,21 @@ class LSTMDecoder(object):
         Whether to show progress of the fit after each epoch
     """
 
-    def __init__(self,units=10,dropout=0,num_epochs=10,verbose=1):
+    def __init__(self,units=15,dropout=0,num_epochs=10,verbose=1):
          self.units=units
          self.dropout=dropout
          self.num_epochs=num_epochs
          self.verbose=verbose
 
+
+    def get_means(self,y_train_mean,y_train_std):
+        
+        global y_mean
+        global y_std
+
+        y_mean = y_train_mean
+        y_std = y_train_std
+        
 
     def fit(self,X_train,y_train):
 
@@ -611,7 +633,7 @@ class LSTMDecoder(object):
         model.add(Dense(y_train.shape[1]))  #,activation='relu' def don't want relu on the output
 
         #Fit model (and set fitting parameters)
-        model.compile(loss='mse',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
+        model.compile(loss='mean_squared_error',optimizer='rmsprop',metrics=['accuracy']) #Set loss function and optimizer
         model.fit(X_train,y_train,nb_epoch=self.num_epochs,verbose=self.verbose) #Fit the model
 
         model.summary()
