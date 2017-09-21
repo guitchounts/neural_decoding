@@ -91,11 +91,11 @@ def load_data(folder):
 	#time = head_data['time']
 
 
-	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
-	#y = np.vstack([ox]).T
-	#y_name = ['ox']
+	y = np.vstack([oz]).T
+	y_name = ['oz']
 
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
@@ -114,7 +114,7 @@ def load_data(folder):
 
 	for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
-		y[:,i] = filter(y[:,i],[3.],filt_type='lowpass')
+		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
 
 
 
@@ -455,7 +455,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
-		model_lstm=LSTMDecoder(dropout=0,num_epochs=5)
+		model_lstm=LSTMDecoder(dropout=0.25,num_epochs=5)
 
 		#model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
 
