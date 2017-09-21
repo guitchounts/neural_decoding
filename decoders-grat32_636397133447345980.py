@@ -97,7 +97,7 @@ def load_data(folder):
 	y = np.vstack([ox]).T
 	y_name = ['ox']
 
-	y = filter(np.rad2deg( np.unwrap( np.deg2rad(   y) ) ),[0.001],filt_type='highpass',fs=10)
+	y = np.cos(np.deg2rad(y))
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
 	#y_name = ['ox','oy','dx','dy','ax','ay','az']
