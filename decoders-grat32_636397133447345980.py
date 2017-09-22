@@ -319,23 +319,49 @@ def Wiener(X_flat_train,X_flat_valid,y_train,y_valid):
 
 	return model_wf
 
-def WienerCascade():
+def WienerCascade(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 	# ### 4B. Wiener Cascade (Linear Nonlinear Model)
 
-	# In[39]:
+	print 'head items to fit are: ', y_name
+		# In[ ]:
+	for head_item in range(len(y_name)):
 
-	#Declare model
-	model_wc=WienerCascadeDecoder(degree=3)
+		y_train_item = y_train[:,head_item]
+		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
 
-	#Fit model
-	model_wc.fit(X_flat_train,y_train)
+		y_test_item = y_test[:,head_item]
+		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+		print '********************************** Fitting WienerCascade on %s Data **********************************' % y_name[head_item]
+		#Declare model
+		model = WienerCascadeDecoder(degree=3)
 
-	#Get predictions
-	y_valid_predicted_wc=model_wc.predict(X_flat_valid)
+		
 
-	#Get metric of fit
-	R2s_wc=get_R2(y_valid,y_valid_predicted_wc)
-	print('R2s:', R2s_wc)
+		#Fit model
+		model.fit(X_train,y_train_item)
+
+		#Get predictions
+		y_valid_predicted=model.predict(X_valid)
+
+
+		training_prediction=model.predict(X_train)
+
+		R2s_training=get_R2(y_train_item,training_prediction)
+		print 'R2 on training set = ', R2s_training
+
+		#Get metric of fit
+		R2s=get_R2(y_test_item,y_valid_predicted)
+		print('R2s:', R2s)
+		print 'saving prediction ...'
+		np.savez(y_name[head_item] + '_WienerCascade_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
+			y_train_=y_train_item,training_prediction=training_prediction,
+			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
+		#print 'saving model ...'
+		joblib.dump(model, y_name[head_item] + '_WienerCascade.pkl') 
+		print 'plotting results...'
+		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='WienerCascade')
+
+	return model
 
 def XGBoost():
 	# ### 4C. XGBoost (Extreme Gradient Boosting)
@@ -577,6 +603,8 @@ if __name__ == "__main__":
 		data_model = DNN(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
 	elif model_type == 'ridge':
 		data_model = ridgeCV_model(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
+	elif model_type == 'ridge':
+		data_model = WienerCascade(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	
 
 	#with open('model_' + model_type + '_rawjerk','wb') as f:
