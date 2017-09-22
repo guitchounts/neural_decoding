@@ -120,9 +120,10 @@ def load_data(folder):
 
 
 
-	idx = 1000 #int(y.shape[0]/2)
-	print 'max idx = ', idx
-	return y[0:idx,:], lfp_power[0:idx,:],y_name
+	#idx = 1000 #int(y.shape[0]/2)
+	#print 'max idx = ', idx
+	#return y[0:idx,:], lfp_power[0:idx,:],y_name
+	return y, lfp_power,y_name
 	
 	
 	
