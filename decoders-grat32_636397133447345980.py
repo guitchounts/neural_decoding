@@ -255,6 +255,48 @@ def preprocess(jerk,neural_data):
 # ## 4. Run Decoders
 
 
+def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
+ 
+	print 'head items to fit are: ', y_name
+		# In[ ]:
+		for head_item in range(len(y_name)):
+
+			y_train_item = y_train[:,head_item]
+			y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+
+			y_test_item = y_test[:,head_item]
+			y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+			print '********************************** Fitting RidgeCV on %s Data **********************************' % y_name[head_item]
+			#Declare model
+			model = linear_model.RidgeCV(alphas=[0.1, 1.0, 10.0],normalize=True,fit_intercept=True)
+
+			model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
+
+			#Fit model
+			model.fit(X_train,y_train_item)
+
+			#Get predictions
+			y_valid_predicted=model.predict(X_valid)
+
+
+			training_prediction=model.predict(X_train)
+
+			R2s_training=get_R2(y_train_item,training_prediction)
+			print 'R2 on training set = ', R2s_training
+
+			#Get metric of fit
+			R2s=get_R2(y_test_item,y_valid_predicted)
+			print('R2s:', R2s)
+			print 'saving prediction ...'
+			np.savez(y_name[head_item] + '_RidgeCV_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
+				y_train_=y_train_item,training_prediction=training_prediction,
+				y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
+			#print 'saving model ...'
+			
+			print 'plotting results...'
+			plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='RidgeCV')
+
+		return model
 
 
 
