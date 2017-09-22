@@ -271,7 +271,7 @@ def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 		#Declare model
 		model = linear_model.RidgeCV(alphas=[0.1, 1.0, 10.0],normalize=True,fit_intercept=True)
 
-		model_lstm.get_means(y_train_mean,y_train_std) ### for un-zscoring during loss calculation ??? 
+		
 
 		#Fit model
 		model.fit(X_train,y_train_item)
