@@ -49,6 +49,7 @@ from decoders import SVRDecoder
 import h5py
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
+from sklearn import linear_model
 
 import seaborn as sns
 sns.set_style('white')
