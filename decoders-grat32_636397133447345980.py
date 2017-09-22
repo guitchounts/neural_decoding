@@ -293,7 +293,7 @@ def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
-		
+		joblib.dump(model, y_name[head_item] + '_Ridge.pkl') 
 		print 'plotting results...'
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='RidgeCV')
 
