@@ -575,7 +575,7 @@ if __name__ == "__main__":
 	elif model_type == 'dnn':
 		data_model = DNN(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
 	elif model_type == 'ridge':
-		data_model = ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std)
+		data_model = ridgeCV_model(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	
 
 	#with open('model_' + model_type + '_rawjerk','wb') as f:
