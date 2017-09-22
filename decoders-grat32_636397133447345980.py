@@ -263,10 +263,10 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 	for head_item in range(len(y_name)):
 
 		y_train_item = y_train[:,head_item]
-		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+		#y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
 
 		y_test_item = y_test[:,head_item]
-		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+		#y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting %s on %s Data **********************************' % (model_name,y_name[head_item])
 		#Declare model
 		model = linear_model.BayesianRidge(compute_score=True)
