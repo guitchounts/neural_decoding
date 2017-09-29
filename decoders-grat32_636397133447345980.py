@@ -126,10 +126,11 @@ def load_data(folder):
 
 
 
-	#idx = int(y.shape[0]/2)
+	#idx = 1000 #int(y.shape[0]/2)
 	#print 'max idx = ', idx
 	#return y[0:idx,:], lfp_power[0:idx,:],y_name
 	return y, spikes,y_name
+	
 	
 	
 
@@ -269,10 +270,10 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 	for head_item in range(len(y_name)):
 
 		y_train_item = y_train[:,head_item]
-		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
+		#y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
 
 		y_test_item = y_test[:,head_item]
-		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
+		#y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
 		print '********************************** Fitting %s on %s Data **********************************' % (model_name,y_name[head_item])
 		#Declare model
 		model = linear_model.BayesianRidge(compute_score=True)
@@ -609,8 +610,9 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 
 
 def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
-
-
+    print 'y_valid shape = ',y_valid.shape
+    print 'y_valid_predicted shape = ', y_valid_predicted.shape
+    print stats.pearsonr(y_valid,y_valid_predicted)
     f, axarr = plt.subplots(2,dpi=600)
     axarr[0].set_title(model_name +' Model of %s. R^2 = %f. r = %f ' % (y_name,R2s,stats.pearsonr(y_valid,y_valid_predicted)[0] ))
 
