@@ -105,14 +105,20 @@ def load_data(folder):
 
 
 	#lfp_file = np.load('lfp_power.npz')
-	lfp_file = h5py.File('lfp_power.hdf5','r')
+	lfp_file = h5py.File('lfp_power.hdf5','r') 
 
 	lfp_power = lfp_file['lfp_power'][:].T
 
 	lfp_file.close()
 
+	spikes_file = h5py.File('lfp_power.hdf5','r') 
+
+	spikes = spikes_file['sorted_spikes'][:]
+
+	spikes_file.close()	
+
 	print 'Shape of head data = ', y.shape
-	print 'Shape of LFP power = ', lfp_power.shape
+	print 'Shape of spikes = ', spikes.shape
 
 	#for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
@@ -123,7 +129,7 @@ def load_data(folder):
 	#idx = int(y.shape[0]/2)
 	#print 'max idx = ', idx
 	#return y[0:idx,:], lfp_power[0:idx,:],y_name
-	return y, lfp_power,y_name
+	return y, spikes,y_name
 	
 	
 
