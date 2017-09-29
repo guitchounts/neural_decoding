@@ -111,7 +111,7 @@ def load_data(folder):
 
 	lfp_file.close()
 
-	spikes_file = h5py.File('lfp_power.hdf5','r') 
+	spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
 	spikes = spikes_file['sorted_spikes'][:]
 
