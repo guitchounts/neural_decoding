@@ -629,8 +629,14 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
     axarr[1].set_ylabel('Predicted')
     axarr[1].axis('equal')
 
-    sns.despine(left=True,bottom=True)
-    f.savefig(model_name + '_%s.pdf' % y_name)
+	sns.despine(left=True,bottom=True)
+    
+
+    save_folder = './plots/' + model_name + '/'
+	if not os.path.exists(save_folder):
+		os.makedirs(save_folder)
+    
+    f.savefig(save_folder + model_name + '_%s.pdf' % y_name)
 
 
 
