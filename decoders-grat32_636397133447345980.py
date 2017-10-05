@@ -111,14 +111,14 @@ def load_data(folder):
 
 	lfp_file.close()
 
-	spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
+	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
-	spikes = spikes_file['sorted_spikes'][:]
+	#spikes = spikes_file['sorted_spikes'][:]
 
-	spikes_file.close()	
+	#spikes_file.close()	
 
 	print 'Shape of head data = ', y.shape
-	print 'Shape of spikes = ', spikes.shape
+	print 'Shape of lfp_power = ', lfp_power.shape
 
 	#for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
@@ -129,7 +129,7 @@ def load_data(folder):
 	#idx = 1000 #int(y.shape[0]/2)
 	#print 'max idx = ', idx
 	#return y[0:idx,:], lfp_power[0:idx,:],y_name
-	return y, spikes,y_name
+	return y, lfp_power,y_name
 	
 	
 	
@@ -183,9 +183,9 @@ def preprocess(jerk,neural_data):
 	# In[32]:
 
 	#Set what part of data should be part of the training/testing/validation sets
-	training_range=[0.2, 1]
+	training_range=[0, 0.5]
 	testing_range=[0.7, 0.85]
-	valid_range=[0, 0.2]
+	valid_range=[0.5, 1]
 
 
 	# #### Split Data
@@ -629,13 +629,13 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
     axarr[1].set_ylabel('Predicted')
     axarr[1].axis('equal')
 
-	sns.despine(left=True,bottom=True)
-    
+    sns.despine(left=True,bottom=True)
+
 
     save_folder = './plots/' + model_name + '/'
-	if not os.path.exists(save_folder):
-		os.makedirs(save_folder)
-    
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+
     f.savefig(save_folder + model_name + '_%s.pdf' % y_name)
 
 
