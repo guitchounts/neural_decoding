@@ -113,12 +113,17 @@ def load_data(head_file,neural_data_file):
 	print neural_data_file.keys()[0].find('spikes')
 	if neural_data_file.keys()[0].find('spikes') == -1:
 		print 'Loading LFPs'
-		neural_data = neural_data_file['lfp_power'][:].T
+		neural_data = neural_data_file['lfp_power'][:]
 	else:
 		print 'Loading Spikes'
-		neural_data = neural_data_file['sorted_spikes'][:].T
+		neural_data = neural_data_file['sorted_spikes'][:]
 
 	neural_data_file.close()
+
+	### make sure neural data is in right shape (samples x channels):
+	if neural_data.shape[0] < neural_data.shape[1]:
+		neural_data = neural_data.T
+
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
