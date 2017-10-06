@@ -110,6 +110,7 @@ def load_data(head_file,neural_data_file):
 	neural_data_file = h5py.File(neural_data_file,'r') 
 
 	### determine if it's spikes or LFPs:
+	print neural_data_file.keys()[0].find('spikes')
 	if neural_data_file.keys()[0].find('spikes') == -1:
 		print 'Loading LFPs'
 		neural_data = neural_data_file['lfp_power'][:].T
@@ -659,7 +660,7 @@ if __name__ == "__main__":
 	model_type = sys.argv[1] ## wiener or lstm
 
 	head_file = sys.argv[2]
-	neural_data_file = sys.argv[2]
+	neural_data_file = sys.argv[3]
 
 	head_data,neural_data,y_name = load_data(head_file,neural_data_file)
 
