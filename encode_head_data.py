@@ -665,7 +665,7 @@ if __name__ == "__main__":
 	head_file = sys.argv[2]
 	neural_data_file = sys.argv[3]
 
-	save_folder = './plots/' + model_name + '/'
+	save_folder = './plots/' + model_type + '/'
     if not os.path.exists(save_folder):
         os.makedirs(save_folder)
 
