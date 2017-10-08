@@ -622,12 +622,12 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std,sav
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
-		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM',save_folder)
+		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM',save_folder=save_folder)
 
 	return model_lstm
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR',save_folder):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='SVR',save_folder):
     print 'y_valid shape = ',y_valid.shape
     print 'y_valid_predicted shape = ', y_valid_predicted.shape
     print stats.pearsonr(y_valid,y_valid_predicted)
@@ -640,7 +640,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
 
     axarr[0].plot(y_valid_predicted,linewidth=0.1,color='red')
 
-    axarr[1].set_title(params)
+    #axarr[1].set_title('_')
     axarr[1].scatter(y_valid,y_valid_predicted,alpha=0.05,marker='o')
     #axarr[1].set_title('R2 = ' + str(R2s))
     axarr[1].set_xlabel('Actual')
