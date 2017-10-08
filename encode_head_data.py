@@ -627,7 +627,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std,sav
 	return model_lstm
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='SVR',save_folder):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,model_name='SVR',save_folder='./'):
     print 'y_valid shape = ',y_valid.shape
     print 'y_valid_predicted shape = ', y_valid_predicted.shape
     print stats.pearsonr(y_valid,y_valid_predicted)
