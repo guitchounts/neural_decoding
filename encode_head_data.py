@@ -579,7 +579,7 @@ def GRU():
 	R2s_gru=get_R2(y_valid,y_valid_predicted_gru)
 	print('R2s:', R2s_gru)
 
-def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
+def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std,save_folder):
 	# ### 4H. LSTM (Long Short Term Memory)
 	print 'head items to fit are: ', y_name
 	# In[ ]:
@@ -616,18 +616,18 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 
 
 
-		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
+		np.savez(save_folder + y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
 		print 'plotting results...'
-		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM')
+		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM',save_folder)
 
 	return model_lstm
 
 
-def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
+def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR',save_folder):
     print 'y_valid shape = ',y_valid.shape
     print 'y_valid_predicted shape = ', y_valid_predicted.shape
     print stats.pearsonr(y_valid,y_valid_predicted)
@@ -650,9 +650,7 @@ def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR
     sns.despine(left=True,bottom=True)
 
 
-    save_folder = './plots/' + model_name + '/'
-    if not os.path.exists(save_folder):
-        os.makedirs(save_folder)
+    
 
     f.savefig(save_folder + model_name + '_%s.pdf' % y_name)
 
@@ -667,13 +665,17 @@ if __name__ == "__main__":
 	head_file = sys.argv[2]
 	neural_data_file = sys.argv[3]
 
+	save_folder = './plots/' + model_name + '/'
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder)
+
 	head_data,neural_data,y_name = load_data(head_file,neural_data_file)
 
 	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 
 	
 	if model_type == 'lstm':
-		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
+		data_model = run_LSTM(X_train,X_valid,y_train,y_valid,y_name, y_train_mean,y_train_std,save_folder)
 	elif model_type == 'wiener':
 		data_model = Wiener(X_flat_train,X_flat_valid,y_train,y_valid)
 	elif model_type == 'svr':
