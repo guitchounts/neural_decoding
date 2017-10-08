@@ -20,7 +20,7 @@ def get_R2(y_test,y_test_pred):
     return R2
 
 
-def get_data(folder):
+def get_data(folder,model_name):
     y_tests = [] 
     y_predictions = []
 
@@ -35,10 +35,10 @@ def get_data(folder):
 
     for i in range(len(y_names)):
         
-        head_file = np.load(folder + '/%s_ridgecv_ypredicted.npz' % y_names[i] )
+        head_file = np.load(folder + '/%s_%s_ypredicted.npz' % (y_names[i],model_name) )
         
-        train_mean =0 # head_file['y_train_mean']
-        train_std = 1 # head_file['y_train_std']
+        train_mean = head_file['y_train_mean']
+        train_std =  head_file['y_train_std']
         print  y_names[i], ' train mean and std are: ', train_mean,train_std
 
         tmp_test = head_file['y_test']  * train_std + train_mean 
@@ -124,10 +124,12 @@ def plot_results(valids,predictions,y_name,R2s,r,model_name='GRU'):
 if __name__ == "__main__":
 
     folder = os.getcwd() # '/Users/guitchounts/Dropbox (coxlab)/Ephys/Data/GRat32/636397133447345980/'
+    
+    model_name = 'LSTM'
 
-    y_tests,y_predictions,y_names,y_plot_names,R2s,rs = get_data(folder)
+    y_tests,y_predictions,y_names,y_plot_names,R2s,rs = get_data(folder,model_name)
 
-    plot_results(y_tests,y_predictions,y_plot_names,R2s,rs,model_name='RidgeCV')
+    plot_results(y_tests,y_predictions,y_plot_names,R2s,rs,model_name=model_name)
 
 
 
