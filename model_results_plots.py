@@ -35,10 +35,10 @@ def get_data(folder):
 
     for i in range(len(y_names)):
         
-        head_file = np.load(folder + '/%s_ridgecv_ypredicted.npz' % y_names[i] )
+        head_file = np.load(folder + '/%s_LSTM_ypredicted.npz' % y_names[i] )
         
-        train_mean =0 # head_file['y_train_mean']
-        train_std = 1 # head_file['y_train_std']
+        train_mean =head_file['y_train_mean']
+        train_std = head_file['y_train_std']
         print  y_names[i], ' train mean and std are: ', train_mean,train_std
 
         tmp_test = head_file['y_test']  * train_std + train_mean 
