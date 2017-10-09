@@ -66,9 +66,9 @@ def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
     filtered_trace = signal.filtfilt(b,a,ephys,axis=0)
     return filtered_trace
 
-def load_data(folder):
+def load_data(head_file,neural_data_file):
 
-	head_data = h5py.File('all_head_data.hdf5','r')
+	head_data = h5py.File(head_file,'r')
 	
 
 
@@ -104,12 +104,26 @@ def load_data(folder):
 	#y_name = ['ox','oy','dx','dy','ax','ay','az']
 
 
-	#lfp_file = np.load('lfp_power.npz')
-	lfp_file = h5py.File('lfp_power.hdf5','r') 
+	
 
-	lfp_power = lfp_file['lfp_power'][:].T
 
-	lfp_file.close()
+	neural_data_file = h5py.File(neural_data_file,'r') 
+
+	### determine if it's spikes or LFPs:
+	print neural_data_file.keys()[0].find('spikes')
+	if neural_data_file.keys()[0].find('spikes') == -1:
+		print 'Loading LFPs'
+		neural_data = neural_data_file['lfp_power'][:]
+	else:
+		print 'Loading Spikes'
+		neural_data = neural_data_file['sorted_spikes'][:]
+
+	neural_data_file.close()
+
+	### make sure neural data is in right shape (samples x channels):
+	if neural_data.shape[0] < neural_data.shape[1]:
+		neural_data = neural_data.T
+
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
@@ -118,7 +132,7 @@ def load_data(folder):
 	#spikes_file.close()	
 
 	print 'Shape of head data = ', y.shape
-	print 'Shape of lfp_power = ', lfp_power.shape
+	print 'Shape of neural_data = ', neural_data.shape
 
 	#for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
@@ -128,8 +142,8 @@ def load_data(folder):
 
 	#idx = 1000 #int(y.shape[0]/2)
 	#print 'max idx = ', idx
-	#return y[0:idx,:], lfp_power[0:idx,:],y_name
-	return y, lfp_power,y_name
+	#return y[0:idx,:], neural_data[0:idx,:],y_name
+	return y, neural_data,y_name
 	
 	
 	
@@ -598,6 +612,10 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
 		print('R2s:', R2s_lstm)
 		print 'saving prediction ...'
+
+
+
+
 		np.savez(y_name[head_item] + '_LSTM_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted_lstm,
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
@@ -646,7 +664,10 @@ if __name__ == "__main__":
 
 	model_type = sys.argv[1] ## wiener or lstm
 
-	head_data,neural_data,y_name = load_data(os.getcwd())
+	head_file = sys.argv[2]
+	neural_data_file = sys.argv[3]
+
+	head_data,neural_data,y_name = load_data(head_file,neural_data_file)
 
 	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 
