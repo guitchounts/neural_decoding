@@ -92,8 +92,11 @@ def load_data(head_file,neural_data_file):
 	#time = head_data['time']
 
 
-	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	head_variables = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	
+
+
+	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
 	#y = np.vstack([ox]).T
 	#y_name = ['ox']
@@ -124,6 +127,7 @@ def load_data(head_file,neural_data_file):
 	if neural_data.shape[0] < neural_data.shape[1]:
 		neural_data = neural_data.T
 
+	y_name = [str(thing) for thing in range(neural_data.shape[1])] ### electrode names
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
@@ -131,7 +135,7 @@ def load_data(head_file,neural_data_file):
 
 	#spikes_file.close()	
 
-	print 'Shape of head data = ', y.shape
+	print 'Shape of head data = ', head_variables.shape
 	print 'Shape of neural_data = ', neural_data.shape
 
 	#for i in range(len(y_name)):
@@ -143,7 +147,7 @@ def load_data(head_file,neural_data_file):
 	#idx = 1000 #int(y.shape[0]/2)
 	#print 'max idx = ', idx
 	#return y[0:idx,:], neural_data[0:idx,:],y_name
-	return neural_data, y ,y_name
+	return neural_data, head_variables ,y_name
 	
 	
 	
@@ -325,16 +329,16 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 
 def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
  
-	print 'head items to fit are: ', y_name
+	print 'neural items to fit are: ', y_name
 		# In[ ]:
-	for head_item in range(len(y_name)):
+	for neural_item in range(len(y_name)):
 
-		y_train_item = y_train[:,head_item]
+		y_train_item = y_train[:,neural_item]
 		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
 
-		y_test_item = y_test[:,head_item]
+		y_test_item = y_test[:,neural_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting RidgeCV on %s Data **********************************' % y_name[head_item]
+		print '********************************** Fitting RidgeCV on %s Data **********************************' % y_name[neural_item]
 		#Declare model
 		model = linear_model.RidgeCV(alphas=[0.1, 1.0, 10.0],normalize=True,fit_intercept=True)
 
@@ -356,13 +360,13 @@ def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 		R2s=get_R2(y_test_item,y_valid_predicted)
 		print('R2s:', R2s)
 		print 'saving prediction ...'
-		np.savez(y_name[head_item] + '_RidgeCV_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
+		np.savez(y_name[neural_item] + '_RidgeCV_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
 			y_train_=y_train_item,training_prediction=training_prediction,
-			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
+			y_train_mean=y_train_mean[neural_item],y_train_std=y_train_std[neural_item])
 		#print 'saving model ...'
-		joblib.dump(model, y_name[head_item] + '_Ridge.pkl') 
+		joblib.dump(model, y_name[neural_item] + '_RidgeEncoding.pkl') 
 		print 'plotting results...'
-		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='RidgeCV')
+		plot_results(y_test_item,y_valid_predicted,y_name[neural_item],R2s,model_name='RidgeCVencoding')
 
 	return model
 

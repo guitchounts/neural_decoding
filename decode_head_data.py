@@ -92,11 +92,11 @@ def load_data(head_file,neural_data_file):
 	#time = head_data['time']
 
 
-	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
 
-	#y = np.vstack([ox]).T
-	#y_name = ['ox']
+	y = np.vstack([xyz]).T
+	y_name = ['xyz']
 
 	#y = np.unwrap(np.unwrap(np.deg2rad(y)))
 
