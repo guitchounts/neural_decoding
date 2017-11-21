@@ -92,11 +92,11 @@ def load_data(head_file,neural_data_file):
 	#time = head_data['time']
 
 
-	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
-	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy','theta']
+	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy]).T
+	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy']
 
-	y = np.vstack([xyz]).T
-	y_name = ['xyz']
+	#y = np.vstack([xyz]).T
+	#y_name = ['xyz']
 
 	#y = np.unwrap(np.unwrap(np.deg2rad(y)))
 
@@ -111,12 +111,18 @@ def load_data(head_file,neural_data_file):
 
 	### determine if it's spikes or LFPs:
 	print neural_data_file.keys()[0].find('spikes')
-	if neural_data_file.keys()[0].find('spikes') == -1:
+	if neural_data_file.keys()[0].find('spikes') == 1:
+		print 'Loading Spikes'
+		neural_data = neural_data_file['sorted_spikes'][:]
+		
+	elif neural_data_file.keys()[0].find('lfp_power') == 1:
 		print 'Loading LFPs'
 		neural_data = neural_data_file['lfp_power'][:]
 	else:
-		print 'Loading Spikes'
-		neural_data = neural_data_file['sorted_spikes'][:]
+		print 'Loading something?'
+		key = neural_data_file.keys()[0]
+		neural_data = neural_data_file[key][:]
+		
 
 	neural_data_file.close()
 
@@ -124,6 +130,8 @@ def load_data(head_file,neural_data_file):
 	if neural_data.shape[0] < neural_data.shape[1]:
 		neural_data = neural_data.T
 
+
+	## limit the size of the neural data?
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
