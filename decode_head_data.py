@@ -55,7 +55,7 @@ import seaborn as sns
 sns.set_style('white')
 
 from scipy import stats,signal
-
+from transforms3d import euler
 
 def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
 	
@@ -84,7 +84,18 @@ def load_data(head_file,neural_data_file):
 
 	xyz = np.sqrt(ax**2 + ay**2 + az**2)
 
-	theta = np.rad2deg(np.arctan(ax/ay))
+	# theta = np.rad2deg(np.arctan(ax/ay))
+
+	dx_neg = np.empty(dx.shape)
+	dx_pos = np.empty(dx.shape)
+	
+	dx_neg[np.where(dx < 0)[0]] = dx[np.where(dx < 0)[0]]
+
+	dx_pos[np.where(dx > 0)[0]] = dx[np.where(dx > 0)[0]]
+
+
+	left = dx_neg**2
+	right = dx_pos**2
 
 	head_data.close()
 	#xy_acc = head_data['xy_acc']
@@ -92,12 +103,16 @@ def load_data(head_file,neural_data_file):
 	#time = head_data['time']
 
 
-	y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy]).T
-	y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy']
+	
 
-	#y = np.vstack([xyz]).T
-	#y_name = ['xyz']
 
+	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy]).T
+	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy']
+
+
+
+
+	
 	#y = np.unwrap(np.unwrap(np.deg2rad(y)))
 
 	#y = np.vstack([ox,oy,dx,dy,ax,ay,az]).T
@@ -110,7 +125,8 @@ def load_data(head_file,neural_data_file):
 	neural_data_file = h5py.File(neural_data_file,'r') 
 
 	### determine if it's spikes or LFPs:
-	print neural_data_file.keys()[0].find('spikes')
+	print neural_data_file.keys()
+
 	if neural_data_file.keys()[0].find('spikes') == 1:
 		print 'Loading Spikes'
 		neural_data = neural_data_file['sorted_spikes'][:]
@@ -132,6 +148,27 @@ def load_data(head_file,neural_data_file):
 
 
 	## limit the size of the neural data?
+	
+	#q = []
+
+	#for i in range(1000000): 
+	#	q.append(euler.euler2quat(np.deg2rad(ox[i]),np.deg2rad(oz[i]),np.deg2rad(oy[i]))) ### yaw,pitch,roll
+
+	#y = np.asarray(q)  #np.vstack([q]).T
+	#y_name = ['quaternion1','quaternion2','quaternion3','quaternion4']
+
+	#dx = np.gradient(filter(signal.medfilt(np.unwrap(np.deg2rad(ox)),[21]),[1],filt_type='lowpass',fs=100.))
+	#dy = np.gradient(filter(signal.medfilt(oy,[21]),[1],filt_type='lowpass',fs=100.))
+	#dz = np.gradient(filter(signal.medfilt(oz,[21]),[1],filt_type='lowpass',fs=100.))
+
+	y = np.vstack([left,right]).T
+	y_name = ['left','right']
+
+	if neural_data.shape[0] > 100000:
+		print 'Truncating  data to 1 million points'
+		neural_data = neural_data[0:int(1e5),:]
+		y = y[0:int(1e5),:]
+	
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
@@ -143,7 +180,7 @@ def load_data(head_file,neural_data_file):
 	print 'Shape of neural_data = ', neural_data.shape
 
 	#for i in range(len(y_name)):
-		#y[:,i] = signal.medfilt(y[:,i],[9])
+	#	y[:,i] = signal.medfilt(y[:,i],[21])
 	#	y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
 
 
@@ -164,9 +201,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=10 #How many bins of neural data prior to the output are used for decoding
+	bins_before=50 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=10 #How many bins of neural data after the output are used for decoding
+	bins_after=50 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
@@ -270,15 +307,15 @@ def preprocess(jerk,neural_data):
 	X_flat_valid=(X_flat_valid-X_flat_train_mean)/X_flat_train_std
 
 	#Z-score  outputs
-	y_train_mean=np.mean(y_train,axis=0)
+	y_train_mean=np.nanmean(y_train,axis=0)
 
 	y_train_std=np.nanstd(y_train,axis=0)
 
 
 	#### 
-	y_train=(y_train-y_train_mean)/y_train_std
-	y_test=(y_test-y_train_mean)/y_train_std
-	y_valid=(y_valid-y_train_mean)/y_train_std
+	y_train=(y_train-y_train_mean) #/y_train_std
+	y_test=(y_test-y_train_mean) #/y_train_std
+	y_valid=(y_valid-y_train_mean) #/y_train_std
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 

@@ -84,7 +84,7 @@ def load_data(head_file,neural_data_file):
 
 	xyz = np.sqrt(ax**2 + ay**2 + az**2)
 
-	theta = np.rad2deg(np.arctan(ax/ay))
+	
 
 	head_data.close()
 	#xy_acc = head_data['xy_acc']
@@ -92,7 +92,7 @@ def load_data(head_file,neural_data_file):
 	#time = head_data['time']
 
 
-	head_variables = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy,theta]).T
+	head_variables = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy]).T
 	
 
 
@@ -113,13 +113,20 @@ def load_data(head_file,neural_data_file):
 	neural_data_file = h5py.File(neural_data_file,'r') 
 
 	### determine if it's spikes or LFPs:
-	print neural_data_file.keys()[0].find('spikes')
-	if neural_data_file.keys()[0].find('spikes') == -1:
+	print neural_data_file.keys()
+	
+	if neural_data_file.keys()[0].find('spikes') == 1:
+		print 'Loading Spikes'
+		neural_data = neural_data_file['sorted_spikes'][:]
+		
+	elif neural_data_file.keys()[0].find('lfp_power') == 1:
 		print 'Loading LFPs'
 		neural_data = neural_data_file['lfp_power'][:]
 	else:
-		print 'Loading Spikes'
-		neural_data = neural_data_file['sorted_spikes'][:]
+		print 'Loading something?'
+		key = neural_data_file.keys()[0]
+		neural_data = neural_data_file[key][:]
+		
 
 	neural_data_file.close()
 
@@ -127,8 +134,10 @@ def load_data(head_file,neural_data_file):
 	if neural_data.shape[0] < neural_data.shape[1]:
 		neural_data = neural_data.T
 
-	y_name = [str(thing) for thing in range(neural_data.shape[1])] ### electrode names
 
+
+	y_name =  map(str, range(neural_data.shape[1])) ### electrode names
+	print 'y names == ', y_name
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
 
 	#spikes = spikes_file['sorted_spikes'][:]
@@ -141,7 +150,12 @@ def load_data(head_file,neural_data_file):
 	#for i in range(len(y_name)):
 		#y[:,i] = signal.medfilt(y[:,i],[9])
 	#	y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
-
+	limit = int(1e6)
+	if neural_data.shape[0] > limit:
+		print 'Truncating  data to %d points' % limit
+		neural_data = neural_data[0:limit,:]
+		head_variables = head_variables[0:limit,:]
+	
 
 
 	#idx = 1000 #int(y.shape[0]/2)
@@ -152,7 +166,7 @@ def load_data(head_file,neural_data_file):
 	
 	
 
-def preprocess(jerk,neural_data):
+def preprocess(head_data,neural_data):
 	# ## 3. Preprocess Data
 
 	# ### 3A. User Inputs
@@ -160,10 +174,12 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=10 #How many bins of neural data prior to the output are used for decoding
+	bins_before=50 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=10 #How many bins of neural data after the output are used for decoding
+	bins_after=50 #How many bins of neural data after the output are used for decoding
 
+	print 'Finding NANs in head_data: ', np.where(np.isnan(head_data))[0].shape
+	print 'Finding NANs in neural_data: ', np.where(np.isnan(neural_data))[0].shape
 
 	# ### 3B. Format Covariates
 
@@ -179,7 +195,7 @@ def preprocess(jerk,neural_data):
 	#Put in "flat" format, so each "neuron / time" is a single feature
 	X_flat=X.reshape(X.shape[0],(X.shape[1]*X.shape[2]))
 
-
+	print 'Finding NANs in X: ', np.where(np.isnan(X))[0].shape
 
 	# #### Format Output Covariates
 
@@ -187,7 +203,7 @@ def preprocess(jerk,neural_data):
 
 	#Set decoding output
 	#y=jerk_power
-	y=jerk
+	y=head_data
 
 
 
@@ -253,28 +269,36 @@ def preprocess(jerk,neural_data):
 	#Z-score "X" inputs. 
 	X_train_mean=np.nanmean(X_train,axis=0)
 	X_train_std=np.nanstd(X_train,axis=0)
-	X_train=(X_train-X_train_mean)/X_train_std
-	X_test=(X_test-X_train_mean)/X_train_std
-	X_valid=(X_valid-X_train_mean)/X_train_std
+
+	X_train=(X_train-X_train_mean) #/X_train_std
+	X_test=(X_test-X_train_mean) #/X_train_std
+	X_valid=(X_valid-X_train_mean) #/X_train_std
 
 
 	#Z-score "X_flat" inputs. 
 	X_flat_train_mean=np.nanmean(X_flat_train,axis=0)
 	X_flat_train_std=np.nanstd(X_flat_train,axis=0)
-	X_flat_train=(X_flat_train-X_flat_train_mean)/X_flat_train_std
-	X_flat_test=(X_flat_test-X_flat_train_mean)/X_flat_train_std
-	X_flat_valid=(X_flat_valid-X_flat_train_mean)/X_flat_train_std
+
+	X_flat_train=(X_flat_train-X_flat_train_mean) #/X_flat_train_std
+	X_flat_test=(X_flat_test-X_flat_train_mean) #/X_flat_train_std
+	X_flat_valid=(X_flat_valid-X_flat_train_mean) #/X_flat_train_std
 
 	#Z-score  outputs
-	y_train_mean=np.mean(y_train,axis=0)
+	y_train_mean=np.nanmean(y_train,axis=0)
 
 	y_train_std=np.nanstd(y_train,axis=0)
-
-
-	#### 
+	
 	y_train=(y_train-y_train_mean)/y_train_std
 	y_test=(y_test-y_train_mean)/y_train_std
 	y_valid=(y_valid-y_train_mean)/y_train_std
+
+
+	# print 'FINDING NANs X_flat_train: ', np.where(np.isnan(X_flat_train))
+	# print 'FINDING NANs X_flat_valid: ', np.where(np.isnan(X_flat_valid))
+	# print 'FINDING NANs X_train: ', np.where(np.isnan(X_train))
+	# print 'FINDING NANs X_valid: ', np.where(np.isnan(X_valid))
+	# print 'FINDING NANs y_train: ', np.where(np.isnan(y_train))
+	# print 'FINDING NANs y_valid: ', np.where(np.isnan(y_valid))
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 
