@@ -236,9 +236,12 @@ def preprocess(jerk,neural_data):
 
 
 	print '###################### getting non-zero values ######################'
-
-	y = y[y != 0]
-	X_flat = X_flat[y != 0]
+	non_zeros = np.where(y)[0]
+	print y.shape
+	y = y[non_zeros,:]
+	print y.shape
+	print X_flat.shape
+	X_flat = X_flat[non_zeros,:]
 
 	# ### 3C. Split into training / testing / validation sets
 	# Note that hyperparameters should be determined using a separate validation set. 
@@ -258,7 +261,7 @@ def preprocess(jerk,neural_data):
 
 	# In[81]:
 
-	num_examples=X.shape[0]
+	num_examples=X_flat.shape[0]
 
 	#Note that each range has a buffer of"bins_before" bins at the beginning, and "bins_after" bins at the end
 	#This makes it so that the different sets don't include overlapping neural data
