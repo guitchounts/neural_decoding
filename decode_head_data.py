@@ -168,10 +168,11 @@ def load_data(head_file,neural_data_file):
 
 	y_name = ['dyaw']
 
-	if neural_data.shape[0] > 100000:
+	cuttoff = int(1e5)
+	if neural_data.shape[0] > cuttoff:
 		print 'Truncating  data to 1 million points'
-		neural_data = neural_data[0:int(1e5),:]
-		y = y[0:int(1e5),:]
+		neural_data = neural_data[0:cuttoff,:]
+		y = y[0:cuttoff,:]
 	
 
 	#spikes_file = h5py.File('all_sorted_spikes.hdf5','r') 
@@ -236,7 +237,7 @@ def preprocess(jerk,neural_data):
 
 
 	print '###################### getting non-zero values ######################'
-	non_zeros = np.where(y)[0]
+	non_zeros = np.where(abs(y) >= 0.5 )[0]
 	print y.shape
 	y = y[non_zeros,:]
 	print y.shape
