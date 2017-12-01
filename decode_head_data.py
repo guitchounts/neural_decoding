@@ -161,8 +161,12 @@ def load_data(head_file,neural_data_file):
 	#dy = np.gradient(filter(signal.medfilt(oy,[21]),[1],filt_type='lowpass',fs=100.))
 	#dz = np.gradient(filter(signal.medfilt(oz,[21]),[1],filt_type='lowpass',fs=100.))
 
-	y = np.vstack([left,right]).T
-	y_name = ['left','right']
+	#y = np.vstack([left,right]).T
+	#y_name = ['left','right']
+
+	y = np.vstack([dx]).T
+
+	y_name = ['dyaw']
 
 	if neural_data.shape[0] > 100000:
 		print 'Truncating  data to 1 million points'
@@ -231,7 +235,10 @@ def preprocess(jerk,neural_data):
 	y=jerk
 
 
+	print '###################### getting non-zero values ######################'
 
+	y = y[y != 0]
+	X_flat = X_flat[y != 0]
 
 	# ### 3C. Split into training / testing / validation sets
 	# Note that hyperparameters should be determined using a separate validation set. 
@@ -316,6 +323,9 @@ def preprocess(jerk,neural_data):
 	y_train=(y_train-y_train_mean) #/y_train_std
 	y_test=(y_test-y_train_mean) #/y_train_std
 	y_valid=(y_valid-y_train_mean) #/y_train_std
+
+	
+
 
 	return X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid,y_train_mean,y_train_std
 
