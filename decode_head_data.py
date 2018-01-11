@@ -50,6 +50,7 @@ import h5py
 from sklearn.externals import joblib
 from sklearn.preprocessing import StandardScaler
 from sklearn import linear_model
+from sklearn.decomposition import PCA
 
 import seaborn as sns
 sns.set_style('white')
@@ -66,11 +67,29 @@ def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
     filtered_trace = signal.filtfilt(b,a,ephys,axis=0)
     return filtered_trace
 
+# def get_mean_lfp(neural_data):
+
+# 	## get the 384 matrix down to 64 by averaging LFP power by band within each tetrode:
+# 	x = np.arange(384)
+# 	within_tet_band_starts = []
+# 	for i in range(6):
+# 	    within_tet_band_starts.append(x[i:24:6])
+# 	within_tet_band_starts = np.asarray(within_tet_band_starts)
+	
+# 	tet_starts = x[0::24]
+
+# 	for tet in range(16):
+#     	for band in range(6):    
+#         	#print x[within_tet_band_starts[band] + tet_starts[tet]]
+#         	neural_data = 
+
+
+
 def load_data(head_file,neural_data_file):
 
 	head_data = h5py.File(head_file,'r')
 	
-
+	#jerk_power = head_data['jerk_power'][:]
 
 	dx = head_data['dx'][:]
 	dy = head_data['dy'][:]
@@ -86,16 +105,16 @@ def load_data(head_file,neural_data_file):
 
 	# theta = np.rad2deg(np.arctan(ax/ay))
 
-	dx_neg = np.empty(dx.shape)
-	dx_pos = np.empty(dx.shape)
+	# dx_neg = np.empty(dx.shape)
+	# dx_pos = np.empty(dx.shape)
 	
-	dx_neg[np.where(dx < 0)[0]] = dx[np.where(dx < 0)[0]]
+	# dx_neg[np.where(dx < 0)[0]] = dx[np.where(dx < 0)[0]]
 
-	dx_pos[np.where(dx > 0)[0]] = dx[np.where(dx > 0)[0]]
+	# dx_pos[np.where(dx > 0)[0]] = dx[np.where(dx > 0)[0]]
 
 
-	left = dx_neg**2
-	right = dx_pos**2
+	# left = dx_neg**2
+	# right = dx_pos**2
 
 	head_data.close()
 	#xy_acc = head_data['xy_acc']
@@ -109,6 +128,8 @@ def load_data(head_file,neural_data_file):
 	#y = np.vstack([xyz,oz,dx,dy,dz,ax,ay,az,ox,oy]).T
 	#y_name = ['xyz','oz','dx','dy','dz','ax','ay','az','ox','oy']
 
+	y = np.vstack([xyz]).T
+	y_name = ['xyz']
 
 
 
@@ -164,13 +185,13 @@ def load_data(head_file,neural_data_file):
 	#y = np.vstack([left,right]).T
 	#y_name = ['left','right']
 
-	y = np.vstack([dx]).T
+	# y = np.vstack([jerk_power]).T
 
-	y_name = ['dyaw']
+	# y_name = ['jerk_power']
 
-	cuttoff = int(1e5)
+	cuttoff = int(1e6)
 	if neural_data.shape[0] > cuttoff:
-		print 'Truncating  data to 1 million points'
+		print 'Truncating  data to %d points' % cuttoff
 		neural_data = neural_data[0:cuttoff,:]
 		y = y[0:cuttoff,:]
 	
@@ -184,9 +205,9 @@ def load_data(head_file,neural_data_file):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of neural_data = ', neural_data.shape
 
-	#for i in range(len(y_name)):
+	for i in range(len(y_name)):
 	#	y[:,i] = signal.medfilt(y[:,i],[21])
-	#	y[:,i] = filter(y[:,i],[1.],filt_type='lowpass')
+		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass',fs=100.)
 
 
 
@@ -196,7 +217,38 @@ def load_data(head_file,neural_data_file):
 	return y, neural_data,y_name
 	
 	
-	
+def sample_dx_uniformly(derivative,num_points=10000):
+    ################### sample the dx distribution evenly: ####################
+    derivative = np.squeeze(derivative)
+    bins = 10000
+    hist,edges = np.histogram(derivative,bins=bins,normed=True)
+    
+    bins_where_values_from = np.searchsorted(edges,derivative)
+    
+    bin_weights = 1/(hist/sum(hist))
+    
+    inv_weights = bin_weights[bins_where_values_from-1]
+    
+    dx_idx = np.arange(0,len(derivative),1)
+
+    sampled_dx_idx = np.random.choice(dx_idx,size=num_points,replace=False,p =inv_weights/sum(inv_weights)  )
+
+    sampled_dx = np.random.choice(derivative,size=num_points,replace=False,p =inv_weights/sum(inv_weights)  )
+
+
+    f,axarr = plt.subplots(2,dpi=600,sharex=True)
+
+    axarr[0].hist(derivative,bins=200)
+    axarr[0].set_ylabel('d_yaw \n original')
+
+    axarr[1].hist(sampled_dx,bins=200)
+    axarr[1].set_ylabel('d_yaw \n resampled')
+
+    sns.despine(left=True,bottom=True)
+
+    f.savefig('resampled_original_histograms.pdf')
+
+    return sampled_dx_idx	
 
 def preprocess(jerk,neural_data):
 	# ## 3. Preprocess Data
@@ -235,14 +287,20 @@ def preprocess(jerk,neural_data):
 	#y=jerk_power
 	y=jerk
 
+	# for i in [0]: # range(y.shape[1])
+	# 	resamp_idx = sample_dx_uniformly(y[:,i],num_points=10000)
+	# 	resamp_idx = np.sort(resamp_idx)
 
-	print '###################### getting non-zero values ######################'
-	non_zeros = np.where(abs(y) >= 0.5 )[0]
-	print y.shape
-	y = y[non_zeros,:]
-	print y.shape
-	print X_flat.shape
-	X_flat = X_flat[non_zeros,:]
+	# 	y = y[resamp_idx,:]
+	# 	X_flat = X_flat[resamp_idx,:]
+
+	# print '###################### getting non-zero values ######################'
+	# non_zeros = np.where(abs(y) >= 0.5 )[0]
+	# print y.shape
+	# y = y[non_zeros,:]
+	# print y.shape
+	# print X_flat.shape
+	# X_flat = X_flat[non_zeros,:]
 
 	# ### 3C. Split into training / testing / validation sets
 	# Note that hyperparameters should be determined using a separate validation set. 
@@ -303,11 +361,11 @@ def preprocess(jerk,neural_data):
 	# In[82]:
 
 	#Z-score "X" inputs. 
-	X_train_mean=np.nanmean(X_train,axis=0)
-	X_train_std=np.nanstd(X_train,axis=0)
-	X_train=(X_train-X_train_mean)/X_train_std
-	X_test=(X_test-X_train_mean)/X_train_std
-	X_valid=(X_valid-X_train_mean)/X_train_std
+	# X_train_mean=np.nanmean(X_train,axis=0)
+	# X_train_std=np.nanstd(X_train,axis=0)
+	# X_train=(X_train-X_train_mean)/X_train_std
+	# X_test=(X_test-X_train_mean)/X_train_std
+	# X_valid=(X_valid-X_train_mean)/X_train_std
 
 
 	#Z-score "X_flat" inputs. 
