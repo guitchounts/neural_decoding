@@ -813,7 +813,9 @@ if __name__ == "__main__":
 
 			X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data[:,i::6])
 
-			y_name = y_name + '_' + band_names[i]
+			
+
+			y_name = [name + '_' + band_names[i] for name in y_name]
 
 			data_model = ridge_band_time(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	
