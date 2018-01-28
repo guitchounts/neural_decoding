@@ -205,9 +205,9 @@ def load_data(head_file,neural_data_file):
 	print 'Shape of head data = ', y.shape
 	print 'Shape of neural_data = ', neural_data.shape
 
-	for i in range(len(y_name)):
-	#	y[:,i] = signal.medfilt(y[:,i],[21])
-		y[:,i] = filter(y[:,i],[1.],filt_type='lowpass',fs=100.)
+	# for i in range(len(y_name)):
+	# #	y[:,i] = signal.medfilt(y[:,i],[21])
+	# 	y[:,i] = filter(y[:,i],[1.],filt_type='lowpass',fs=100.)
 
 
 
@@ -258,9 +258,9 @@ def preprocess(jerk,neural_data):
 
 	# In[25]:
 
-	bins_before=50 #How many bins of neural data prior to the output are used for decoding
+	bins_before=10 #How many bins of neural data prior to the output are used for decoding
 	bins_current=1 #Whether to use concurrent time bin of neural data
-	bins_after=50 #How many bins of neural data after the output are used for decoding
+	bins_after=10 #How many bins of neural data after the output are used for decoding
 
 
 	# ### 3B. Format Covariates
@@ -436,7 +436,6 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name=model_name)
 
 	return model
-
 
 
 
@@ -786,7 +785,7 @@ if __name__ == "__main__":
 
 	head_data,neural_data,y_name = load_data(head_file,neural_data_file)
 
-	X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
+	#X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 
 	
 	if model_type == 'lstm':
@@ -799,8 +798,29 @@ if __name__ == "__main__":
 		RNN(X_train,y_train,X_valid,y_valid,y_name,y_name)
 	elif model_type == 'dnn':
 		data_model = DNN(X_flat_train,X_flat_valid,y_train,y_valid,y_name)
+	
+
 	elif model_type == 'ridge':
+		X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data)
 		data_model = ridgeCV_model(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
+	
+	elif model_type == 'ridge_band_time_search':
+
+		band_names = ['delta','theta','alpha','beta','low_gamma','high_gamma']
+
+		## neural data = samples x channels
+		for i in range(6):
+
+			X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data[:,i::6])
+
+			y_name = y_name + '_' + band_names[i]
+			
+			data_model = ridge_band_time(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
+	
+
+
+
+
 	elif model_type == 'WienerCascade':
 		data_model = WienerCascade(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	elif model_type == 'BayesianRidge':

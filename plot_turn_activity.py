@@ -93,11 +93,12 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
     f = plt.figure(dpi=600)
 
 
-    gs = gridspec.GridSpec(2, 1)
+    gs = gridspec.GridSpec(3, 1)
 
       
     ax1 = plt.subplot(gs[0, 0])
     ax2 = plt.subplot(gs[1, 0])
+    ax3 = plt.subplot(gs[2, 0])
 
     if head_name == 'dx':
         dir1 = 'Left'
@@ -127,13 +128,29 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
     ax1.set_ylabel('Mean ' + head_name)
     ax1.axes.xaxis.set_ticklabels([])
 
-    sns.tsplot(np.mean(X_left,axis=0).T,time = time, color="#2ecc71",ax=ax2)
+    # sns.tsplot(np.mean(X_left,axis=0).T,time = time, color="#2ecc71",ax=ax2)
 
-    sns.tsplot(np.mean(X_right,axis=0).T,time=time,color="#9b59b6",ax=ax2)
+    # sns.tsplot(np.mean(X_right,axis=0).T,time=time,color="#9b59b6",ax=ax2)
 
-    ax2.set_ylabel('Z-scored Firing Rate')
-    ax2.set_xlabel('Time from turn onset (sec)')
+    # ax2.set_ylabel('Z-scored Firing Rate')
+    # ax2.set_xlabel('Time from turn onset (sec)')
 
+    mean_X_right = np.mean(X_right,axis=0) ## (trials x time x tetrode) -> (time x tetrode)
+    mean_X_left = np.mean(X_left,axis=0)
+
+    norm_X_right = mean_X_right  #/ np.max(mean_X_right,axis=0)
+    norm_X_left = mean_X_left  #/ np.max(mean_X_left,axis=0)
+
+    ax2.pcolormesh(time,np.arange(17),norm_X_right.T,cmap='viridis',edgecolors='face')
+
+    ax3.pcolormesh(time,np.arange(17),norm_X_left.T,cmap='viridis',edgecolors='face')
+
+    ax2.axes.xaxis.set_ticklabels([])
+
+    ax2.set_ylabel('Firing Rates \n for Right Turns')
+    ax3.set_ylabel('Firing Rates \n for Left Turns')
+
+    ax3.set_xlabel('Time from turn onset (sec)')
 
     #ax2 = plt.plot([0,0],ax2.get_ylim(),c='k',alpha=.5)
 
@@ -179,25 +196,31 @@ if __name__ == "__main__":
     #             '636463456945299197',
     #             '636464513098770001',
     #             '636465322265480001']
+    all_files =  [
+                    '636461785781685886',
+                    '636462564120970001',
+                    '636464402756620001',
+                    '636465208859170001',
 
+                ]
 
     ### GRat31
-    all_files = ['636426429249996956',
-                 '636427229078062061',
-                 '636427282621202061',
-                 '636428029026710180',
-                 '636428089543470180',
-                 '636428953768193973',
-                 '636429016120323973',
-                 '636429913515267697',
-                 '636430663717571697',
-                 '636431765535543697',
-                 '636432491422312001',
-                 '636438551166665948',
-                 '636438658377315948',
-                 '636439164041965948',
-                 '636439502672505948',
-                 '636440035877005948']
+    # all_files = ['636426429249996956',
+    #              '636427229078062061',
+    #              '636427282621202061',
+    #              '636428029026710180',
+    #              '636428089543470180',
+    #              '636428953768193973',
+    #              '636429016120323973',
+    #              '636429913515267697',
+    #              '636430663717571697',
+    #              '636431765535543697',
+    #              '636432491422312001',
+    #              '636438551166665948',
+    #              '636438658377315948',
+    #              '636439164041965948',
+    #              '636439502672505948',
+    #              '636440035877005948']
 
 
     for fil in all_files:
@@ -211,4 +234,7 @@ if __name__ == "__main__":
             y_left,y_right,X_left,X_right = extract_peak_windows(mua,derivative)
 
             plot(y_left,y_right,X_left,X_right,head_names[i],fil)
+
+            np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+
 
