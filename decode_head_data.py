@@ -56,7 +56,7 @@ import seaborn as sns
 sns.set_style('white')
 
 from scipy import stats,signal
-from transforms3d import euler
+#from transforms3d import euler
 
 def filter(ephys,freq_range,filt_order = 4,filt_type='bandpass',fs=10.):
 	
@@ -814,7 +814,7 @@ if __name__ == "__main__":
 			X_flat_train,X_flat_valid,X_train,X_valid,y_train,y_valid, y_train_mean,y_train_std = preprocess(head_data,neural_data[:,i::6])
 
 			y_name = y_name + '_' + band_names[i]
-			
+
 			data_model = ridge_band_time(X_flat_train,X_flat_valid,y_train,y_valid,y_name, y_train_mean,y_train_std)
 	
 
