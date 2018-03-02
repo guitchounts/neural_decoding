@@ -103,12 +103,12 @@ def get_spikes_with_history(neural_data,bins_before,bins_after,bins_current=1):
         For every time bin, there are the firing rates of all neurons from the specified number of time bins before (and after)
     """
 
-    print '******************************** Getting Spikes with History *************************************'
+    print('******************************** Getting Spikes with History *************************************')
 
     num_examples=neural_data.shape[0] #Number of total time bins we have neural data for
     num_neurons=neural_data.shape[1] #Number of neurons
     surrounding_bins=bins_before+bins_after+bins_current #Number of surrounding time bins used for prediction
-    print 'num_examples, num_neurons, surrounding_bins = ', num_examples, num_neurons, surrounding_bins
+    print('num_examples, num_neurons, surrounding_bins = ', num_examples, num_neurons, surrounding_bins)
     
     X=np.empty([num_examples,surrounding_bins,num_neurons]) #Initialize covariate matrix with NaNs
     #X[:] = np.NaN
