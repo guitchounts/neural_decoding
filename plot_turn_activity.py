@@ -173,7 +173,7 @@ def get_X_y(path):
 
     mua_file.close()
 
-    limit = int(6e5)
+    limit = int(6e6)
     if mua.shape[0] > limit:
         print('Reducing Data Size Down to %d Samples' % limit)
         mua  = mua[0:limit,:]
@@ -196,13 +196,13 @@ if __name__ == "__main__":
     #             '636463456945299197',
     #             '636464513098770001',
     #             '636465322265480001']
-    all_files =  [
-                    '636461785781685886',
-                    '636462564120970001',
-                    '636464402756620001',
-                    '636465208859170001',
+    # all_files =  [
+    #                 '636461785781685886',
+    #                 '636462564120970001',
+    #                 '636464402756620001',
+    #                 '636465208859170001',
 
-                ]
+    #             ]
 
     ### GRat31
     # all_files = ['636426429249996956',
@@ -222,6 +222,11 @@ if __name__ == "__main__":
     #              '636439502672505948',
     #              '636440035877005948']
 
+    input_file_path = os.getcwd()
+    all_files = []
+    for file in os.listdir(input_file_path):
+            if file.startswith("636"):
+                all_files.append(file)
 
     for fil in all_files:
 
