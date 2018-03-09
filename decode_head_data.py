@@ -395,7 +395,7 @@ def preprocess(jerk,neural_data):
 
 def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
  
- 	model_name = 'BayesianRidge'
+	model_name = 'BayesianRidge'
 	print 'head items to fit are: ', y_name
 		# In[ ]:
 	for head_item in range(len(y_name)):
