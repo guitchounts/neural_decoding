@@ -222,12 +222,13 @@ if __name__ == "__main__":
     #              '636439502672505948',
     #              '636440035877005948']
 
-    input_file_path = os.getcwd()
-    all_files = []
-    for file in os.listdir(input_file_path):
-            if file.startswith("636"):
-                all_files.append(file)
+    # input_file_path = os.getcwd()
+    # all_files = []
+    # for file in os.listdir(input_file_path):
+    #         if file.startswith("636"):
+    #             all_files.append(file)
 
+    all_files = ['636511715885134658']
     for fil in all_files:
 
         mua,head_signals = get_X_y(fil)
