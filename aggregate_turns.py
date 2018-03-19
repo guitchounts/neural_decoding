@@ -118,6 +118,7 @@ def plot_single_tetrode(all_turn_data,behavior_condition,dx_type,dx_key,tetrode)
 
     ax1 = plt.subplot(gs[0, 0:19])   
     im1 = ax1.pcolormesh(np.concatenate(all_turn_data[behavior_condition][dx_type][dx_key])[:,:,tetrode],vmin=0,vmax=1,cmap='RdPu')
+    im1.set_rasterized(True)
     ax1.set_ylabel('Turn Trials')
     #ax1b = plt.subplot(gs[0, 19])   
     
@@ -131,6 +132,7 @@ def plot_single_tetrode(all_turn_data,behavior_condition,dx_type,dx_key,tetrode)
     #ax2b = plt.subplot(gs[1, 19],sharey=ax2)   
     
     im2 = ax2.pcolormesh(np.mean(np.concatenate(all_turn_data[behavior_condition][dx_type][dx_key]),axis=0).T,vmin=0,vmax=.5,cmap='RdPu')
+    im2.set_rasterized(True)
     ax2.set_ylabel('Tetrodes')  
     #f.colorbar(im2,ax=ax2b)
     divider = make_axes_locatable(ax2)
@@ -178,7 +180,8 @@ if __name__ == "__main__":
 
     """
     #all_turns = {}
-    rat = 'grat27'
+    rat = sys.argv[1]
+    tetrodes = sys.argv[2]
 
     behavior_conditions = ['dark', 'light', 'muscimol_dark', 'muscimol_light']
 
@@ -200,7 +203,7 @@ if __name__ == "__main__":
     all_turn_data = make_turn_dict(all_turns,exp_names,dx_types,dx_keys)
 
 
-    for tetrode in range(6,8):
+    for tetrode in tetrodes:
         f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
 
 
