@@ -162,7 +162,8 @@ if __name__ == "__main__":
 
     for file in os.listdir(input_file_path):
             if file.startswith("636"):
-                all_files.append(file)
+                if os.path.exists(input_file_path + '/' + file + '/dx.npz'):        
+                    all_files.append(file)
     all_files = np.asarray(all_files)
 
     """
