@@ -154,6 +154,65 @@ def plot_single_tetrode(all_turn_data,behavior_condition,dx_type,dx_key,tetrode)
     
     return f
 
+
+def plot_by_turn_type(all_turn_data,behavior_conditions,dx_type,dx_keys,time,behavior_colors,turn_real_names):
+
+    f = plt.figure(dpi=600)
+    gs = gridspec.GridSpec(3, 1)
+
+
+
+    ## each ax = plot of all behavioral conditions:
+
+    ### ax1 = behavior:
+    for behavior_condition in behavior_conditions:
+        ax1 = plt.subplot(gs[0, 0])
+        ax1.set_ylabel('Turn')
+        ax1.text(0.95, -.75, turn_real_names[dx_type][0],
+            verticalalignment='bottom', horizontalalignment='right', color='k', fontsize=15)
+
+        ax1.text(0.95, .75, turn_real_names[dx_type][1],
+            verticalalignment='bottom', horizontalalignment='right', color='k', fontsize=15)
+
+        
+        for turn_key in range(2): #### this keys either y_left or y_right (i.e. the behavior), the first two options in dx_keys.
+            #print(behavior_condition,dx_type,dx_keys[turn_key])
+            ax1 = sns.tsplot(np.mean(np.concatenate(all_turn_data[behavior_condition][dx_type][dx_keys[turn_key]]),axis=0).T,
+                             time=time,color = behavior_colors[behavior_condition],linewidth=.5,alpha=.75)
+
+            
+    ### ax2 = ephys, first turn:
+    
+        ax2 = plt.subplot(gs[1, 0])
+        X_left = np.mean(np.concatenate(all_turn_data[behavior_condition][dx_type][dx_keys[2]]),axis=0).T
+        print('X_left.shape = ',X_left.shape)
+        ax2.set_ylabel(turn_real_names[dx_type][0])
+        ax2 = sns.tsplot(X_left - np.mean(X_left[:,0:51]), ### dx_keys[2] = X_left
+                         time=time,color = behavior_colors[behavior_condition])
+        
+        
+    ### ax3 = ephys, second turn:
+
+        ax3 = plt.subplot(gs[2, 0])
+        X_left = np.mean(np.concatenate(all_turn_data[behavior_condition][dx_type][dx_keys[3]]),axis=0).T
+        print('X_left.shape = ',X_left.shape)
+        ax3.set_ylabel(turn_real_names[dx_type][1])
+        ax3 = sns.tsplot(X_left - np.mean(X_left[:,0:51]), ### dx_keys[2] = X_left
+                         time=time,color = behavior_colors[behavior_condition])
+
+    
+    ax1.set_ylim([-1.5,1.5])
+    ax2.set_ylim([-0.2,0.2])
+    ax3.set_ylim([-0.2,0.2])
+    ax1.tick_params(axis='y',which='major',length=10,width=1)
+    ax2.tick_params(axis='y',which='major',length=10,width=1)
+    ax3.tick_params(axis='y',which='major',length=10,width=1)
+    ax3.set_xlabel('Time from Turn Onset (sec)')
+    sns.despine(bottom=True,offset=10)
+            
+            
+    return f
+
 if __name__ == "__main__":
 
 
@@ -182,7 +241,9 @@ if __name__ == "__main__":
     """
     #all_turns = {}
     rat = sys.argv[1]
-    tetrodes = sys.argv[2]
+    tetrodes = range(9,16)
+
+    time = np.arange(-1.,1.01,0.01)
 
     behavior_conditions = ['dark', 'light', 'muscimol_dark', 'muscimol_light']
 
@@ -190,8 +251,23 @@ if __name__ == "__main__":
 
     dx_keys = ['y_left', 'y_right', 'X_left', 'X_right'] ### these are the keys of each dx.npy (or dy or dz) files. y = behavior, X = ephys, left = one direction, right = the other
 
-    #turn_names = ['left', 'right', 'up', 'down', 'cw', 'ccw']
+    turn_real_names = {}
 
+    turn_real_names['dx'] = ['Left','Right']
+
+    turn_real_names['dy'] = ['CW','CCW']
+
+    turn_real_names['dz'] = ['Up','Down']
+
+    behavior_colors = {}
+    colors = sns.color_palette("Dark2", 4)
+    behavior_colors[behavior_conditions[0]] = colors[2]
+
+    behavior_colors[behavior_conditions[1]] = colors[0]
+
+    behavior_colors[behavior_conditions[2]] = colors[1]
+
+    behavior_colors[behavior_conditions[3]] = "#3498db" #sns.color_palette("hls", 4)[2]
 
 
     exp_names = get_experiment_names(all_files,rat)
@@ -203,16 +279,21 @@ if __name__ == "__main__":
 
     all_turn_data = make_turn_dict(all_turns,exp_names,dx_types,dx_keys)
 
+    turn_frame = pd.DataFrame.from_dict(all_turn_data)
+    turn_frame.to_csv('./turn_plots/turn_frame.csv')
 
-    for tetrode in tetrodes:
-        f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
-
-
-        f.savefig('./turn_plots/single_tetrode_%d.pdf' % tetrode)
-
+    # for tetrode in tetrodes:
+    #     f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
 
 
+    #     f.savefig('./turn_plots/single_tetrode_%d.pdf' % tetrode)
 
+
+    for dx_type in dx_types:
+
+        f = plot_by_turn_type(all_turn_data,behavior_conditions,dx_type,dx_keys,time,behavior_colors,turn_real_names)
+
+        f.savefig('./turn_plots/tetrode_avg_%s.pdf' % dx_type)
 
 
 
