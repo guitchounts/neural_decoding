@@ -279,8 +279,9 @@ if __name__ == "__main__":
 
     all_turn_data = make_turn_dict(all_turns,exp_names,dx_types,dx_keys)
 
-    turn_frame = pd.DataFrame.from_dict(all_turn_data)
-    turn_frame.to_csv('./turn_plots/turn_frame.csv')
+    #turn_frame = pd.DataFrame.from_dict(all_turn_data)
+    #turn_frame.to_csv('./turn_plots/turn_frame.csv')
+    np.save('./turn_plots/turn_frame.npy',all_turn_data)
 
     # for tetrode in tetrodes:
     #     f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
