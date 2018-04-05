@@ -182,6 +182,19 @@ def get_X_y(path):
     return mua,head_signals
 
 
+def get_all_files():
+    input_file_path = os.getcwd()
+    all_files = []
+
+    for file in os.listdir(input_file_path):
+        if file.startswith("636"):
+            #if os.path.exists(file + res_folder):
+            #    if os.listdir(file + res_folder) !=[]:
+            all_files.append(file)
+
+
+    return np.asarray(all_files)
+
 if __name__ == "__main__":
 
 
@@ -228,7 +241,10 @@ if __name__ == "__main__":
     #         if file.startswith("636"):
     #             all_files.append(file)
 
-    all_files = ['636511715885134658']
+    #all_files = ['636513717602552658']
+
+    all_files = get_all_files()
+    
     for fil in all_files:
 
         mua,head_signals = get_X_y(fil)
