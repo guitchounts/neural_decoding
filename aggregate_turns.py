@@ -281,9 +281,9 @@ def get_deviation(trace):
         turn_peak[i] = tetrode_mean[win_start+peak_idx[i],i]
         baseline[i] = np.mean(trace[:,0:51,i])
  
-    print 'baseline.shape = ',baseline.shape 
+    print('baseline.shape = ',baseline.shape )
     deviation = turn_peak - baseline #( turn_peak - baseline  ) / baseline * 100
-    print 'deviation.shape = ',deviation.shape 
+    print('deviation.shape = ',deviation.shape) 
     
     return deviation
 
