@@ -64,7 +64,7 @@ def get_all_turns(all_files,dx_types):
         dxs = []
         #print dx_type
         for fil in all_files:
-            print fil
+            print(fil)
             keys = ['y_left', 'y_right', 'X_left', 'X_right'] ## right order
             dx_fil = np.load('./' + fil + '/%s.npz' % dx_type)
             
