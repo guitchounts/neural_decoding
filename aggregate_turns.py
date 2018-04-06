@@ -402,7 +402,7 @@ if __name__ == "__main__":
 
     print(all_peaks)
 
-    pickle.dump( all_peaks, open('all_peaks.p' , "wb" ) )
+    pickle.dump( all_peaks, open('all_peaks.p' , "wb" ), protocol=2 )
 
 
 
