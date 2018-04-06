@@ -64,16 +64,20 @@ def get_all_turns(all_files,dx_types):
         dxs = []
         #print dx_type
         for fil in all_files:
-            #print fil
+            print fil
+            keys = ['y_left', 'y_right', 'X_left', 'X_right'] ## right order
             dx_fil = np.load('./' + fil + '/%s.npz' % dx_type)
             
-            x = [np.asarray(dx_fil[key]) for key in dx_fil.keys()] 
+            #print('dx_fil.keys() = ', dx_fil.keys())
+            x = [np.asarray(dx_fil[key]) for key in keys] 
+            print([xx.shape for xx in x])
             #print('len(x) = ', len(x))
             dxs.append(x)
 
             dx_fil.close()
-        #print('len(dxs) = ', len(dxs))
-        
+        print('len(dxs) = ', len(dxs))
+        #print([xx.shape for xx in dxs])
+        print('np.asarray(dxs).shape = ', np.asarray(dxs).shape)
         all_turns.append(np.asarray(dxs))
     
     return np.dstack(all_turns)
@@ -136,12 +140,13 @@ def make_deviations_dict(all_deviations_data,all_turn_data,behavior_conditions,d
 
                     #for session in all_turn_data[behavior][dx_type][left_right]:
                        # get_deviation(session)
-    
-    for behavior in behavior_conditions:
+    print('all_turn_data keys ==== ', all_turn_data.keys())
+    for behavior in [all_turn_data.keys()[0]]: # behavior_conditions:
         for dx_type in dx_types:
-            for left_right in dx_keys[2:]:
+            for left_right in ['X_left','X_right']:
                 print(behavior, dx_type, left_right)
                 for session in all_turn_data[behavior][dx_type][left_right]:
+                    print('session.shape = ', session.shape)
                    # get_deviation(session)
                     #all_turn_data[exp_names[file_num]][dx_types[turn_type]][dx_keys[i]].append
                     all_deviations_data[behavior][dx_type][left_right].append(get_deviation(session))
@@ -259,9 +264,9 @@ def plot_by_turn_type(all_turn_data,behavior_conditions,dx_type,dx_keys,time,beh
 
 def get_deviation(trace):
     ### trace = [trials x time x channels] e.g. 10124 x 201 x 16
-
+    print('trace.shape == ', trace.shape)
     num_tetrodes = trace.shape[2]
-
+    print('num_tetrodes =', num_tetrodes)
     win_start = 90
     win_stop = 111
     
@@ -274,7 +279,7 @@ def get_deviation(trace):
     for i in range(num_tetrodes):
 
         turn_peak[i] = tetrode_mean[win_start+peak_idx[i],i]
-        baseline[i] = np.mean(trace[:,0:51,i],axis=0)
+        baseline[i] = np.mean(trace[:,0:51,i])
  
     print 'baseline.shape = ',baseline.shape 
     deviation = turn_peak - baseline #( turn_peak - baseline  ) / baseline * 100
@@ -341,52 +346,92 @@ if __name__ == "__main__":
 
 
     exp_names = get_experiment_names(all_files,rat)
+    #print('exp_names = ',exp_names)
 
     condition_indexes = get_condition_indexes(exp_names,behavior_conditions)
 
-    all_turns = get_all_turns(all_files,dx_types)
+
+    #### do one file at a time! ??????
+    # for i,fil in enumerate(['636516217500773145', '636516251855668924']):
+    #     print(exp_names[i])
+
+    #     all_turns = get_all_turns([fil],dx_types)
 
 
-    all_turn_data = make_turn_dict(all_turns,exp_names,dx_types,dx_keys) ### dict with keys e.g. all_turn_data['dark']['dx']['X_left']
-
-
-
-    #turn_frame = pd.DataFrame.from_dict(all_turn_data)
-    #turn_frame.to_csv('./turn_plots/turn_frame.csv')
-    #np.save('./turn_plots/turn_frame.npy',all_turn_data)
-
-    # for tetrode in tetrodes:
-    #     f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
-
-
-    #     f.savefig('./turn_plots/single_tetrode_%d.pdf' % tetrode)
+    #     all_turn_data = make_turn_dict(all_turns,[exp_names[i]],dx_types,dx_keys) ### dict with keys e.g. all_turn_data['dark']['dx']['X_left']
 
 
 
+        #turn_frame = pd.DataFrame.from_dict(all_turn_data)
+        #turn_frame.to_csv('./turn_plots/turn_frame.csv')
+        #np.save('./turn_plots/turn_frame.npy',all_turn_data)
 
-    # for dx_type in dx_types:
+        # for tetrode in tetrodes:
+        #     f = plot_single_tetrode(all_turn_data,behavior_condition='dark',dx_type='dx',dx_key='X_left',tetrode=tetrode)
 
-    #     f = plot_by_turn_type(all_turn_data,behavior_conditions,dx_type,dx_keys,time,behavior_colors,turn_real_names)
 
-    #     f.savefig('./turn_plots/tetrode_avg_%s.pdf' % dx_type)
+        #     f.savefig('./turn_plots/single_tetrode_%d.pdf' % tetrode)
 
-    peaks_dict = {    }
 
-    for behavior in behavior_conditions:
+
+
+        # for dx_type in dx_types:
+
+        #     f = plot_by_turn_type(all_turn_data,behavior_conditions,dx_type,dx_keys,time,behavior_colors,turn_real_names)
+
+        #     f.savefig('./turn_plots/tetrode_avg_%s.pdf' % dx_type)
+
+    all_peaks = {  }
+
+    for i,fil in enumerate(all_files):
+        all_peaks[fil] = {'Condition' :  exp_names[i] }
+
         for dx_type in dx_types:
-            for left_right in dx_keys[2:]:
-                print(behavior, dx_type, left_right)
+            
+            dx_fil = np.load('./' + fil + '/%s.npz' % dx_type) ### load a dx, dy, dz file from a given 636 fil. 
+            
+            dx_session = {key : dx_fil[key] for key in dx_fil.keys() } ##### each is a dict with keys = ['y_left', 'y_right', 'X_left', 'X_right'] 
 
-                for session in all_turn_data[behavior][dx_type][left_right]:
-                     get_deviation(session)
+            all_peaks[fil][dx_type] = {'X_left' : [] ,'X_right' : [] }
+            #all_turns[fil][dx_type] = dx_session ### for each all_turns[636...][dx, dy, dz], add the session's dict  
+
+            for turn_dir in ['X_left','X_right']:
+                all_peaks[fil][dx_type][turn_dir] =  get_deviation(   dx_session[turn_dir]   )
 
 
 
-    all_deviations_data = make_empty_turn_dict(all_turns,exp_names,dx_types,dx_keys)
-    all_deviations_data = make_deviations_dict(all_deviations_data,all_turn_data,behavior_conditions,dx_types,dx_keys)
-    print(all_deviations_data)
-    peaks_frame = pd.DataFrame.from_dict(all_deviations_data)
-    peaks_frame.to_csv('./turn_plots/peaks_frame.csv')
+    print(all_peaks)
+
+    pickle.dump( all_peaks, open('all_peaks.p' , "wb" ) )
+
+
+
+
+
+
+
+        # all_deviations_data = make_empty_turn_dict(all_turns,[exp_names[i]],dx_types,dx_keys)
+        # all_deviations_data = make_deviations_dict(all_deviations_data,all_turn_data,behavior_conditions,dx_types,dx_keys)
+        # print(all_deviations_data)
+        # peaks_frame = pd.DataFrame.from_dict(all_deviations_data)
+        
+        # save_dir = '%s/turn_plots/' % fil
+        # if not os.path.exists(save_dir):
+        #             os.makedirs(save_dir)
+
+        # peaks_frame.to_csv(save_dir + 'peaks_frame.csv')
+
+        # pickle.dump( all_deviations_data, open(save_dir + 'peaks.p' , "wb" ) )
+
+
+
+
+
+
+
+
+##########################################################################################################################################
+
 
 
 
