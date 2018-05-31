@@ -93,7 +93,7 @@ def extract_peak_windows(mua,derivative):
         X_right = X_peaks[np.where(labels == 1)[0],:,:]
     
     else:
-        y_left,y_right,X_left,X_right = None        
+        y_left = y_right = X_left = X_right = None        
 
 
     return y_left,y_right,X_left,X_right
