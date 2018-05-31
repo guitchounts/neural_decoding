@@ -134,7 +134,7 @@ if __name__ == "__main__":
     all_files = np.asarray(all_files)
 
     #all_files = ['636511715885134658']
-    for fil in all_files[-3:]:
+    for fil in all_files:
 
         head_data = h5py.File('./'+ fil +'/' + 'all_head_data_100hz.hdf5','r')
 
@@ -145,9 +145,9 @@ if __name__ == "__main__":
         ### ox, oy, oz are idx 6,7,8 (last three)
 
         xyz = np.sqrt(head_signals[:,0]**2 + head_signals[:,1]**2 +  head_signals[:,2]**2)
-        print('x y z  === ',head_signals[0:10,0], head_signals[0:10,1], head_signals[0:10,2])
+        #print('x y z  === ',head_signals[0:10,0], head_signals[0:10,1], head_signals[0:10,2])
         head_data_to_plot = np.vstack([ head_signals[:,6], head_signals[:,7], head_signals[:,8], xyz    ]).T
-        print('head_data_to_plot.shape = ',head_data_to_plot.shape)
+        #print('head_data_to_plot.shape = ',head_data_to_plot.shape)
         head_names_to_plot = ['Yaw', 'Roll', 'Pitch', 'Total Acc']
 
         plot_traces(head_data_to_plot,head_names_to_plot,fil)

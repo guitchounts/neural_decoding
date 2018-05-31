@@ -32,10 +32,13 @@ def get_turn_peaks(dx,threshold):
     crossings =  np.where(abs(dx) > threshold)[0]
     peaks = []
     grouped_crossings = group_consecutives(crossings)
-    for idx,thing in enumerate(grouped_crossings):
-        center = thing[np.argmax(abs(dx[thing]))]
-        peaks.append(center)
-        
+    ## check that there were some crossings; otherwise skip:
+    if len(grouped_crossings) > 1:
+        for idx,thing in enumerate(grouped_crossings):
+            center = thing[np.argmax(abs(dx[thing]))]
+            peaks.append(center)
+    else:
+        peaks = None        
     return peaks
 
 def extract_peak_windows(mua,derivative):
@@ -54,37 +57,44 @@ def extract_peak_windows(mua,derivative):
 
     ## find peaks in the derivative trace:
     d_peaks = get_turn_peaks(derivative,threshold=1)
-    d_peaks = np.asarray(d_peaks)
+    
+    if d_peaks is not None: ## only go ahead if there were some peaks; otherwise skip
+
+        d_peaks = np.asarray(d_peaks)
 
 
-    ## take only those peaks in the ephys and derivative:
-    #y = dy[dy_peaks]
-    X_peaks = X[d_peaks,:,:]
-    peak_windows = d_history[d_peaks,:,0]
-
-
-
-    labels = []
-    for peak in d_peaks:
-        if derivative[peak] > 0:
-            labels.append(1)
-        elif derivative[peak] < 0:
-            labels.append(-1)
-    labels = np.asarray(labels)
-
-
-    """
-    -1 dx = left turns; -1 dy = CW roll; -1 dz = up nod
-    """
+        ## take only those peaks in the ephys and derivative:
+        #y = dy[dy_peaks]
+        X_peaks = X[d_peaks,:,:]
+        peak_windows = d_history[d_peaks,:,0]
 
 
 
-    ### separate the windowed X and y into left and right (or up/down) components:
-    y_left = peak_windows[np.where(labels == -1)[0],:]
-    y_right = peak_windows[np.where(labels == 1)[0],:]
+        labels = []
+        for peak in d_peaks:
+            if derivative[peak] > 0:
+                labels.append(1)
+            elif derivative[peak] < 0:
+                labels.append(-1)
+        labels = np.asarray(labels)
 
-    X_left = X_peaks[np.where(labels == -1)[0],:,:]
-    X_right = X_peaks[np.where(labels == 1)[0],:,:]
+
+        """
+        -1 dx = left turns; -1 dy = CW roll; -1 dz = up nod
+        """
+
+
+
+        ### separate the windowed X and y into left and right (or up/down) components:
+        y_left = peak_windows[np.where(labels == -1)[0],:]
+        y_right = peak_windows[np.where(labels == 1)[0],:]
+
+        X_left = X_peaks[np.where(labels == -1)[0],:,:]
+        X_right = X_peaks[np.where(labels == 1)[0],:,:]
+    
+    else:
+        y_left,y_right,X_left,X_right = None        
+
 
     return y_left,y_right,X_left,X_right
 
@@ -247,6 +257,8 @@ if __name__ == "__main__":
     
     for fil in all_files:
 
+        print('Processing file %s ....' % fil)
+
         mua,head_signals = get_X_y(fil)
         head_names = ['dx','dy','dz']
         
@@ -255,8 +267,11 @@ if __name__ == "__main__":
 
             y_left,y_right,X_left,X_right = extract_peak_windows(mua,derivative)
 
-            plot(y_left,y_right,X_left,X_right,head_names[i],fil)
+            if y_left is not None:
 
-            np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+                plot(y_left,y_right,X_left,X_right,head_names[i],fil)
 
+                np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+            else:
+                print('Found no peaks in file %s. Skipping...' % fil)
 
