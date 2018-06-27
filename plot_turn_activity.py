@@ -154,7 +154,8 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name,tet_num=0,plot_single
         mean_X_right = X_right[:,:,tet_num].T  ## (trials x time x tetrode) -> (time x trials)
         mean_X_left = X_left[:,:,tet_num].T
 
-        save_dir = './' + file_name + '/turn_plots/unit_' + tet_num + '_' + head_name + '.pdf'
+        save_dir = './%s/turn_plots/unit_%d_%s.pdf' % (file_name,tet_num,head_name) ### './' + file_name + '/turn_plots/unit_%d_' % tet_num + head_name + '.pdf'
+
 
     norm_X_right = mean_X_right  #/ np.max(mean_X_right,axis=0)
     norm_X_left = mean_X_left  #/ np.max(mean_X_left,axis=0)
