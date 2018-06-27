@@ -98,7 +98,7 @@ def extract_peak_windows(mua,derivative):
 
     return y_left,y_right,X_left,X_right
 
-def plot(y_left,y_right,X_left,X_right,head_name,file_name):
+def plot(y_left,y_right,X_left,X_right,head_name,file_name,tet_num=0,plot_single_tet=0):
 
     f = plt.figure(dpi=600)
 
@@ -144,14 +144,22 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
 
     # ax2.set_ylabel('Z-scored Firing Rate')
     # ax2.set_xlabel('Time from turn onset (sec)')
+    if plot_single_tet == 0:
+        mean_X_right = np.mean(X_right,axis=0) ## (trials x time x tetrode) -> (time x tetrode)
+        mean_X_left = np.mean(X_left,axis=0)
 
-    mean_X_right = np.mean(X_right,axis=0) ## (trials x time x tetrode) -> (time x tetrode)
-    mean_X_left = np.mean(X_left,axis=0)
+        save_dir = './' + file_name + '/' + head_name + '.pdf'
+        
+    else:
+        mean_X_right = X_right[:,:,tet_num].T  ## (trials x time x tetrode) -> (time x trials)
+        mean_X_left = X_left[:,:,tet_num].T
+
+        save_dir = './' + file_name + '/turn_plots/unit_' + tet_num + '_' + head_name + '.pdf'
 
     norm_X_right = mean_X_right  #/ np.max(mean_X_right,axis=0)
     norm_X_left = mean_X_left  #/ np.max(mean_X_left,axis=0)
 
-    num_units = mean_X_right.shape[1]
+    num_units = mean_X_right.shape[1] ## 16 for mua...
 
     ax2.pcolormesh(time,np.arange(num_units+1),norm_X_right.T,cmap='viridis',edgecolors='face')
 
@@ -169,7 +177,7 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
 
     sns.despine(left=True,bottom=True)
 
-    f.savefig('./' + file_name + '/' + head_name + '.pdf')
+    f.savefig(save_dir)
 
 def get_X_y(path):
 
@@ -271,7 +279,12 @@ if __name__ == "__main__":
 
             if y_left is not None:
 
-                plot(y_left,y_right,X_left,X_right,head_names[i],fil)
+                #plot(y_left,y_right,X_left,X_right,head_names[i],fil)
+                for unit in range(X_left.shape[2]):
+                    print('plotting %dth unit' % unit)
+
+                    plot(y_left,y_right,X_left,X_right,head_names[i],fil,tet_num=unit,plot_single_tet=1)
+                
 
                 np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
             else:
