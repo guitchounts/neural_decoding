@@ -27,7 +27,7 @@ def group_consecutives(vals, step=1):
     return result
 
 def get_turn_peaks(dx,threshold):
-    
+
     ## ephys = samples x electrode channels
     crossings =  np.where(abs(dx) > threshold)[0]
     peaks = []
@@ -38,7 +38,7 @@ def get_turn_peaks(dx,threshold):
             center = thing[np.argmax(abs(dx[thing]))]
             peaks.append(center)
     else:
-        peaks = None        
+        peaks = None
     return peaks
 
 def extract_peak_windows(mua,derivative):
@@ -57,7 +57,7 @@ def extract_peak_windows(mua,derivative):
 
     ## find peaks in the derivative trace:
     d_peaks = get_turn_peaks(derivative,threshold=1)
-    
+
     if d_peaks is not None: ## only go ahead if there were some peaks; otherwise skip
 
         d_peaks = np.asarray(d_peaks)
@@ -91,9 +91,9 @@ def extract_peak_windows(mua,derivative):
 
         X_left = X_peaks[np.where(labels == -1)[0],:,:]
         X_right = X_peaks[np.where(labels == 1)[0],:,:]
-    
+
     else:
-        y_left = y_right = X_left = X_right = None        
+        y_left = y_right = X_left = X_right = None
 
 
     return y_left,y_right,X_left,X_right
@@ -105,7 +105,7 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
 
     gs = gridspec.GridSpec(3, 1)
 
-      
+
     ax1 = plt.subplot(gs[0, 0])
     ax2 = plt.subplot(gs[1, 0])
     ax3 = plt.subplot(gs[2, 0])
@@ -151,9 +151,11 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
     norm_X_right = mean_X_right  #/ np.max(mean_X_right,axis=0)
     norm_X_left = mean_X_left  #/ np.max(mean_X_left,axis=0)
 
-    ax2.pcolormesh(time,np.arange(17),norm_X_right.T,cmap='viridis',edgecolors='face')
+    num_units = mean_X_right.shape[1]
 
-    ax3.pcolormesh(time,np.arange(17),norm_X_left.T,cmap='viridis',edgecolors='face')
+    ax2.pcolormesh(time,np.arange(num_units+1),norm_X_right.T,cmap='viridis',edgecolors='face')
+
+    ax3.pcolormesh(time,np.arange(num_units+1),norm_X_left.T,cmap='viridis',edgecolors='face')
 
     ax2.axes.xaxis.set_ticklabels([])
 
@@ -177,7 +179,7 @@ def get_X_y(path):
     head_signals = np.asarray([np.asarray(head_data[key]) for key in head_data.keys()][0:9]).T[:,idx_start:idx_stop]
     print('head_signals shape: ', head_signals.shape) ## samples x features
 
-    mua_file = h5py.File('./' + path + '/mua_firing_rates_100hz.hdf5','r')
+    mua_file = h5py.File('./' + path + '/sua_firing_rates_100hz.hdf5','r')
 
     mua = mua_file['firing_rates'][:]
 
@@ -251,17 +253,17 @@ if __name__ == "__main__":
     #         if file.startswith("636"):
     #             all_files.append(file)
 
-    #all_files = ['636513717602552658']
+    all_files = ['636510937083046658']
 
-    all_files = get_all_files()
-    
+    #all_files = get_all_files()
+
     for fil in all_files:
 
         print('Processing file %s ....' % fil)
 
         mua,head_signals = get_X_y(fil)
         head_names = ['dx','dy','dz']
-        
+
         for i in range(3):
             derivative = head_signals[:,3+i]
 
@@ -274,4 +276,3 @@ if __name__ == "__main__":
                 np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
             else:
                 print('Found no peaks in file %s. Skipping...' % fil)
-
