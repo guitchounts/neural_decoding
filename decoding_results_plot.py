@@ -17,7 +17,7 @@ def get_exp_names(rat,all_files):
     exp_names = []
     for fil in all_files:
         for exp in os.listdir('./' + fil + '/'):
-            if exp.startswith('%s_0' % rat):
+            if exp.startswith('%s_1' % rat):
                 exp_names.append(exp[exp.find('m_')+2:exp.find('.txt')])
 
     return np.asarray(exp_names)
@@ -42,18 +42,18 @@ if __name__ == "__main__":
     # roll_name = """['roll_abs']_results.npz"""
     # yaw_name = """['yaw_abs']_results.npz"""
 
-    rat = 'grat36'
-    res_folder =  '/031918_mua/' # '/022618_mua/' # '/031618_mua/' #'/031718_ridge_mua/'  # '/022618_mua/' # #
+    rat = 'grat28'
+    res_folder =   '/060518_ridge_mua/' # '/031718_ridge_mua/' # ## ' #/031918_mua/' # '/022618_mua/' # '/031618_mua/' #'/031718_ridge_mua/'  # '/022618_mua/' # #
 
-    # all_files = get_all_files(res_folder)
-    # exp_names = get_exp_names(rat,all_files)
-    # print(all_files,exp_names)
+    all_files = get_all_files(res_folder)
+    exp_names = get_exp_names(rat,all_files)
+    print(all_files,exp_names)
     
-    exp_info = pd.DataFrame.from_csv('111817_mua_files.csv')
-    all_files = exp_info['Files'].values
-    exp_names = exp_info['Conditions'].values
-    res_folder = exp_info['Experiment'][0] + '/'
-    print all_files,exp_names,res_folder
+    # exp_info = pd.DataFrame.from_csv('111817_mua_files.csv')
+    # all_files = exp_info['Files'].values
+    # exp_names = exp_info['Conditions'].values
+    # res_folder = exp_info['Experiment'][0] + '/'
+    # print all_files,exp_names,res_folder
     
     results_normal_names = ['pitch_abs', 'roll_abs','yaw_abs', 'total_acc']
     results_file_names = ["""['pitch_abs']_results.npz""",  """['roll_abs']_results.npz""", """['yaw_abs']_results.npz""", """['total_acc']_results.npz"""]
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     all_data_frame['R2'] = r2_frame['R2']
 
 
-    hue_order = ['dark','light','muscimol_dark','muscimol_light']
+    hue_order = ['dark','light','dark_muscimol','light_muscimol']
     new_dark_pal = [sns.color_palette("Dark2", 3)[2],
                     sns.color_palette("Dark2", 3)[0],
                     sns.color_palette("Dark2", 3)[1],
