@@ -270,7 +270,7 @@ if __name__ == "__main__":
             for i in range(3):
                 derivative = all_head_signals[chunk][:,3+i]
 
-                print 'all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape
+                print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
                 y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
 
                 plot(y_left,y_right,X_left,X_right,head_names[i],fil,chunk)
