@@ -244,4 +244,4 @@ if __name__ == "__main__":
 
                 print('$$$$$$$$$$$$$$$$$$ SHAPES of %s for file %s  = ' % (head_names[i], fil),X_left.shape,X_right.shape  )
 
-                y_left,y_right,X_left,X_right = None
+                y_left = y_right = X_left = X_right = None
