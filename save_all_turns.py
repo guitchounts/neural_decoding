@@ -18,7 +18,7 @@ def load_npz(fil,d): ### d = dx, dy, or dz
     for dir_item in os.listdir('./' + fil):
         if dir_item.startswith("%s_" % d):
             if dir_item.endswith(".npz"):
-                print dir_item
+                print(dir_item)
                 dx_fil = np.load('./%s/%s' % (fil,dir_item))
                 dx_fils.append(dx_fil)
                 #dx_fil.close()
@@ -76,4 +76,4 @@ if __name__ == "__main__":
 	                d_item = np.concatenate([d['%s_%s' % (var,direction)] for dx in d_files for d in dx])
 	                d_items[var][direction] = d_item
 	                np.save('%s/%s_%s_%s_%s.npy' % (save_dir,head_variable,condition,var,direction),d_item)
-	                print d_item.shape
+	                print(d_item.shape)
