@@ -67,7 +67,7 @@ if __name__ == "__main__":
     for i,fil in enumerate(all_files): #### all_files !!!!!
         
         for res in results_normal_names:
-            print type(fil),type(res_folder),type(res)
+            print(type(fil),type(res_folder),type(res))
             tmp_file_dir = './' +str(fil) + res_folder + """['%s']_results.npz""" %  res
             
             if os.path.exists(tmp_file_dir):
