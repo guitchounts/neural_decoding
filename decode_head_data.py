@@ -146,17 +146,17 @@ def load_data(head_file,neural_data_file):
 	neural_data_file = h5py.File(neural_data_file,'r') 
 
 	### determine if it's spikes or LFPs:
-	print neural_data_file.keys()
+	print(neural_data_file.keys())
 
 	if neural_data_file.keys()[0].find('spikes') == 1:
-		print 'Loading Spikes'
+		print('Loading Spikes')
 		neural_data = neural_data_file['sorted_spikes'][:]
 		
 	elif neural_data_file.keys()[0].find('lfp_power') == 1:
-		print 'Loading LFPs'
+		print('Loading LFPs')
 		neural_data = neural_data_file['lfp_power'][:]
 	else:
-		print 'Loading something?'
+		print('Loading something?')
 		key = neural_data_file.keys()[0]
 		neural_data = neural_data_file[key][:]
 		
@@ -191,7 +191,7 @@ def load_data(head_file,neural_data_file):
 
 	cuttoff = int(1e6)
 	if neural_data.shape[0] > cuttoff:
-		print 'Truncating  data to %d points' % cuttoff
+		print('Truncating  data to %d points' % cuttoff)
 		neural_data = neural_data[0:cuttoff,:]
 		y = y[0:cuttoff,:]
 	
@@ -202,8 +202,8 @@ def load_data(head_file,neural_data_file):
 
 	#spikes_file.close()	
 
-	print 'Shape of head data = ', y.shape
-	print 'Shape of neural_data = ', neural_data.shape
+	print('Shape of head data = ', y.shape)
+	print('Shape of neural_data = ', neural_data.shape)
 
 	# for i in range(len(y_name)):
 	# #	y[:,i] = signal.medfilt(y[:,i],[21])
@@ -395,8 +395,8 @@ def preprocess(jerk,neural_data):
 
 def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
  
- 	model_name = 'BayesianRidge'
-	print 'head items to fit are: ', y_name
+	model_name = 'BayesianRidge'
+	print('head items to fit are: ', y_name)
 		# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -405,7 +405,7 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 
 		y_test_item = y_test[:,head_item]
 		#y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting %s on %s Data **********************************' % (model_name,y_name[head_item])
+		print('********************************** Fitting %s on %s Data **********************************' % (model_name,y_name[head_item]))
 		#Declare model
 		model = linear_model.BayesianRidge(compute_score=True)
 
@@ -421,18 +421,18 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 		training_prediction=model.predict(X_train)
 
 		R2s_training=get_R2(y_train_item,training_prediction)
-		print 'R2 on training set = ', R2s_training
+		print('R2 on training set = ', R2s_training)
 
 		#Get metric of fit
 		R2s=get_R2(y_test_item,y_valid_predicted)
 		print('R2s:', R2s)
-		print 'saving prediction ...'
+		print('saving prediction ...')
 		np.savez(y_name[head_item] + '_%s_ypredicted.npz' % model_name,y_test=y_test_item,y_prediction=y_valid_predicted,
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		joblib.dump(model, y_name[head_item] + '_%s.pkl' % model_name) 
-		print 'plotting results...'
+		print('plotting results...')
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name=model_name)
 
 	return model
@@ -441,7 +441,7 @@ def BayesianRidge_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_tr
 
 def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
  
-	print 'head items to fit are: ', y_name
+	print('head items to fit are: ', y_name)
 		# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -450,7 +450,7 @@ def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 
 		y_test_item = y_test[:,head_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting RidgeCV on %s Data **********************************' % y_name[head_item]
+		print('********************************** Fitting RidgeCV on %s Data **********************************' % y_name[head_item])
 		#Declare model
 		model = linear_model.RidgeCV(alphas=[0.1, 1.0, 10.0],normalize=True,fit_intercept=True)
 
@@ -466,18 +466,18 @@ def ridgeCV_model(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 		training_prediction=model.predict(X_train)
 
 		R2s_training=get_R2(y_train_item,training_prediction)
-		print 'R2 on training set = ', R2s_training
+		print('R2 on training set = ', R2s_training)
 
 		#Get metric of fit
 		R2s=get_R2(y_test_item,y_valid_predicted)
 		print('R2s:', R2s)
-		print 'saving prediction ...'
+		print('saving prediction ...')
 		np.savez(y_name[head_item] + '_RidgeCV_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		joblib.dump(model, y_name[head_item] + '_Ridge.pkl') 
-		print 'plotting results...'
+		print('plotting results...')
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='RidgeCV')
 
 	return model
@@ -505,7 +505,7 @@ def Wiener(X_flat_train,X_flat_valid,y_train,y_valid):
 def WienerCascade(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 	# ### 4B. Wiener Cascade (Linear Nonlinear Model)
 
-	print 'head items to fit are: ', y_name
+	#print 'head items to fit are: ', y_name
 		# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -514,7 +514,7 @@ def WienerCascade(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 
 		y_test_item = y_test[:,head_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting WienerCascade on %s Data **********************************' % y_name[head_item]
+		#print '********************************** Fitting WienerCascade on %s Data **********************************' % y_name[head_item]
 		#Declare model
 		model = WienerCascadeDecoder(degree=3)
 
@@ -530,18 +530,18 @@ def WienerCascade(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_st
 		training_prediction=model.predict(X_train)
 
 		R2s_training=get_R2(y_train_item,training_prediction)
-		print 'R2 on training set = ', R2s_training
+		print('R2 on training set = ', R2s_training)
 
 		#Get metric of fit
 		R2s=get_R2(y_test_item,y_valid_predicted)
 		print('R2s:', R2s)
-		print 'saving prediction ...'
+		#print 'saving prediction ...'
 		np.savez(y_name[head_item] + '_WienerCascade_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted,
 			y_train_=y_train_item,training_prediction=training_prediction,
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		joblib.dump(model, y_name[head_item] + '_WienerCascade.pkl') 
-		print 'plotting results...'
+		#print 'plotting results...'
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='WienerCascade')
 
 	return model
@@ -584,11 +584,11 @@ def SVR(X_flat_train,X_flat_valid,y_train,y_valid,y_name):
 
 	for head_item in range(len(y_name)):
 		### fit one at a time and save/plot the results 
-		print '########### Fitting SVR on %s data ###########' % y_name[head_item]
+		#print '########### Fitting SVR on %s data ###########' % y_name[head_item]
 
 		y_zscore_train_item = y_zscore_train[:,head_item]
 		y_zscore_train_item = np.reshape(y_zscore_train_item,[y_zscore_train.shape[0],1])
-		print 'shape of y_zscore_train_item = ', y_zscore_train_item.shape
+		#print 'shape of y_zscore_train_item = ', y_zscore_train_item.shape
 
 		y_zscore_valid_item = y_zscore_valid[:,head_item]
 		y_zscore_valid_item = np.reshape(y_zscore_valid_item,[y_zscore_valid_item.shape[0],1])
@@ -611,7 +611,7 @@ def DNN(X_train,X_valid,y_train,y_test,y_name):
 	# ### 4E. Dense Neural Network
 
 	
-	print 'head items to fit are: ', y_name
+	print('head items to fit are: ', y_name)
 	# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -620,7 +620,7 @@ def DNN(X_train,X_valid,y_train,y_test,y_name):
 
 		y_test_item = y_test[:,head_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting DNN on %s Data **********************************' % y_name[head_item]
+		print('********************************** Fitting DNN on %s Data **********************************' % y_name[head_item])
 		#Declare model
 		model_dnn=DenseNNDecoder(units=[128,64,32],num_epochs=15)
 
@@ -633,11 +633,11 @@ def DNN(X_train,X_valid,y_train,y_test,y_name):
 		#Get metric of fit
 		R2s=get_R2(y_test_item,y_valid_predicted)
 		print('R2s:', R2s)
-		print 'saving prediction ...'
+		#print 'saving prediction ...'
 		np.savez(y_name[head_item] + '_DNN_ypredicted.npz',y_test=y_test_item,y_prediction=y_valid_predicted)
 		#print 'saving model ...'
 		#joblib.dump(model_dnn, y_name[head_item] + '_LSTM.pkl') 
-		print 'plotting results...'
+		print('plotting results...')
 		plot_results(y_test_item,y_valid_predicted,y_name[head_item],R2s,model_name='DNN')
 
 	return model_dnn
@@ -645,7 +645,7 @@ def DNN(X_train,X_valid,y_train,y_test,y_name):
 def RNN(X_train,y_train,X_valid,y_valid,y_name):
 	model_name = 'RNN'
 	# ### 4F. Simple RNN
-	print '############################# RUNNING RNN #############################'
+	#print '############################# RUNNING RNN #############################'
 	# In[ ]:
 
 	#Declare model
@@ -653,11 +653,11 @@ def RNN(X_train,y_train,X_valid,y_valid,y_name):
 
 	for head_item in range(len(y_name)):
 		### fit one at a time and save/plot the results 
-		print '########### Fitting RNN on %s data ###########' % y_name[head_item]
+		#print '########### Fitting RNN on %s data ###########' % y_name[head_item]
 
 		y_train_item = y_train[:,head_item]
 		y_train_item = np.reshape(y_train_item,[y_train.shape[0],1])
-		print 'shape of y_train_item = ', y_train_item.shape
+		#print 'shape of y_train_item = ', y_train_item.shape
 
 		y_valid_item = y_valid[:,head_item]
 		y_valid_item = np.reshape(y_valid_item,[y_valid_item.shape[0],1])
@@ -697,7 +697,7 @@ def GRU():
 
 def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 	# ### 4H. LSTM (Long Short Term Memory)
-	print 'head items to fit are: ', y_name
+	#print 'head items to fit are: ', y_name
 	# In[ ]:
 	for head_item in range(len(y_name)):
 
@@ -706,7 +706,7 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 
 		y_test_item = y_test[:,head_item]
 		y_test_item = np.reshape(y_test_item,[y_test_item.shape[0],1])
-		print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
+		#print '********************************** Fitting Deep Net on %s Data **********************************' % y_name[head_item]
 		#Declare model
 		model_lstm=LSTMDecoder(dropout=0.25,num_epochs=5)
 
@@ -722,12 +722,12 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 		training_prediction=model_lstm.predict(X_train)
 
 		R2s_training=get_R2(y_train_item,training_prediction)
-		print 'R2 on training set = ', R2s_training
+		#print 'R2 on training set = ', R2s_training
 
 		#Get metric of fit
 		R2s_lstm=get_R2(y_test_item,y_valid_predicted_lstm)
 		print('R2s:', R2s_lstm)
-		print 'saving prediction ...'
+		#print 'saving prediction ...'
 
 
 
@@ -737,16 +737,16 @@ def run_LSTM(X_train,X_valid,y_train,y_test,y_name, y_train_mean,y_train_std):
 			y_train_mean=y_train_mean[head_item],y_train_std=y_train_std[head_item])
 		#print 'saving model ...'
 		#joblib.dump(model_lstm, y_name[head_item] + '_LSTM.pkl') 
-		print 'plotting results...'
+		#print 'plotting results...'
 		plot_results(y_test_item,y_valid_predicted_lstm,y_name[head_item],R2s_lstm,model_name='LSTM')
 
 	return model_lstm
 
 
 def plot_results(y_valid,y_valid_predicted,y_name,R2s,params='_',model_name='SVR'):
-    print 'y_valid shape = ',y_valid.shape
-    print 'y_valid_predicted shape = ', y_valid_predicted.shape
-    print stats.pearsonr(y_valid,y_valid_predicted)
+    print('y_valid shape = ',y_valid.shape)
+    print('y_valid_predicted shape = ', y_valid_predicted.shape)
+    print(stats.pearsonr(y_valid,y_valid_predicted))
     f, axarr = plt.subplots(2,dpi=600)
     axarr[0].set_title(model_name +' Model of %s. R^2 = %f. r = %f ' % (y_name,R2s,stats.pearsonr(y_valid,y_valid_predicted)[0] ))
 

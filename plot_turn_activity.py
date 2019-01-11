@@ -108,7 +108,11 @@ def extract_peak_windows(mua,derivative,standardize=1):
 
     return y_left,y_right,X_left,X_right
 
+<<<<<<< HEAD
 def plot(y_left,y_right,X_left,X_right,head_name,save_dir,chunk):
+=======
+def plot(y_left,y_right,X_left,X_right,head_name,file_name,chunk):
+>>>>>>> origin/master
 
     f = plt.figure(dpi=600)
 
@@ -179,7 +183,11 @@ def plot(y_left,y_right,X_left,X_right,head_name,save_dir,chunk):
 
     sns.despine(left=True,bottom=True)
 
+<<<<<<< HEAD
     f.savefig(save_dir + head_name +  '_%d.pdf' % chunk)
+=======
+    f.savefig('./' + file_name + '/' + head_name +  '_%d.pdf' % chunk)
+>>>>>>> origin/master
 
 def get_X_y(path):
 
@@ -211,6 +219,7 @@ if __name__ == "__main__":
     for file in os.listdir(input_file_path):
             if file.startswith("636"):
                 all_files.append(file)
+<<<<<<< HEAD
     ### GRat26:
     # all_files = ['636444372823550001',
     #             '636455956910510001',
@@ -247,6 +256,9 @@ if __name__ == "__main__":
     #              '636439164041965948',
     #              '636439502672505948',
     #              '636440035877005948']
+=======
+
+>>>>>>> origin/master
 
 
     for fil in all_files:
@@ -271,11 +283,14 @@ if __name__ == "__main__":
         all_mua = [mua[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ] ## list of 1x16x720000 chunks
         all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
+<<<<<<< HEAD
         sua_path = './'
         save_path = sua_path + '/sua_turns/'
         if not os.path.exists(save_path):
             os.makedirs(save_path)
 
+=======
+>>>>>>> origin/master
         for chunk in range(num_chunks):
 
             for i in range(3):
@@ -284,8 +299,16 @@ if __name__ == "__main__":
                 print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
                 y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
 
+<<<<<<< HEAD
                 plot(y_left,y_right,X_left,X_right,head_names[i],save_path,chunk)
 
                 np.savez(save_path + head_names[i] + '_%d.npz' % chunk,y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+=======
+                plot(y_left,y_right,X_left,X_right,head_names[i],fil,chunk)
 
+                np.savez('./' + fil + '/' + head_names[i] + '_%d.npz' % chunk,y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+>>>>>>> origin/master
 
+                print('$$$$$$$$$$$$$$$$$$ SHAPES of %s for file %s  = ' % (head_names[i], fil),X_left.shape,X_right.shape  )
+
+                y_left = y_right = X_left = X_right = None
