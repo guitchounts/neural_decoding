@@ -11,6 +11,21 @@ sns.set_style('white')
 import h5py
 import matplotlib.gridspec as gridspec
 from preprocessing_funcs import get_spikes_with_history
+from functools import reduce
+
+def get_head_stop(head_data): ## head_data.shape = e.g. (1000000, 4)
+    all_diffs = []
+    head_names = range(9) #['ox','oy','oz','ax','ay','az']
+    for head_name in head_names:
+        all_diffs.append(np.where(np.diff(head_data[:,head_name],100) == 0 )[0])
+
+    all_zeros = reduce(np.intersect1d, (all_diffs))
+    if len(all_zeros) == 0:
+        stop = head_data.shape[0] + 1
+    else:
+        stop = all_zeros[0]
+        print('Truncating head signals at sample %d out of a total of %d samples.' % (stop,head_data.shape[0]))
+    return stop
 
 def group_consecutives(vals, step=1):
     """Return list of consecutive lists of numbers from vals (number list)."""
@@ -32,13 +47,14 @@ def get_turn_peaks(dx,threshold):
     crossings =  np.where(abs(dx) > threshold)[0]
     peaks = []
     grouped_crossings = group_consecutives(crossings)
+    print('Shape of dx and grouped_crossings in get_turn_peaks = ', dx.shape,len(grouped_crossings))
     for idx,thing in enumerate(grouped_crossings):
         center = thing[np.argmax(abs(dx[thing]))]
         peaks.append(center)
         
     return peaks
 
-def extract_peak_windows(mua,derivative):
+def extract_peak_windows(mua,derivative,standardize=1):
     """
     Take ephys (mua) and head signal (derivative), find peaks from the head signal and extract windowed data aligned with those peaks
     """
@@ -47,7 +63,11 @@ def extract_peak_windows(mua,derivative):
     ### standardize ephys and get windows:
     mua_mean=np.nanmean(mua,axis=0)
     mua_std=np.nanstd(mua,axis=0)
-    mua=(mua-mua_mean)/mua_std
+    if standardize:
+        print('Z-scoring Ephys Data for Turns')
+        mua=(mua-mua_mean)/mua_std
+    else:
+        pass
     X = get_spikes_with_history(mua,100,100)
 
     d_history = get_spikes_with_history(np.atleast_2d(derivative).T,100,100) ### get windows for the derivative trace too
@@ -88,7 +108,7 @@ def extract_peak_windows(mua,derivative):
 
     return y_left,y_right,X_left,X_right
 
-def plot(y_left,y_right,X_left,X_right,head_name,file_name):
+def plot(y_left,y_right,X_left,X_right,head_name,save_dir,chunk):
 
     f = plt.figure(dpi=600)
 
@@ -141,9 +161,11 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
     norm_X_right = mean_X_right  #/ np.max(mean_X_right,axis=0)
     norm_X_left = mean_X_left  #/ np.max(mean_X_left,axis=0)
 
-    ax2.pcolormesh(time,np.arange(17),norm_X_right.T,cmap='viridis',edgecolors='face')
+    num_neurons = norm_X_right.shape[1]
 
-    ax3.pcolormesh(time,np.arange(17),norm_X_left.T,cmap='viridis',edgecolors='face')
+    ax2.pcolormesh(time,np.arange(num_neurons+1),norm_X_right.T,cmap='viridis',edgecolors='face')
+
+    ax3.pcolormesh(time,np.arange(num_neurons+1),norm_X_left.T,cmap='viridis',edgecolors='face')
 
     ax2.axes.xaxis.set_ticklabels([])
 
@@ -157,7 +179,7 @@ def plot(y_left,y_right,X_left,X_right,head_name,file_name):
 
     sns.despine(left=True,bottom=True)
 
-    f.savefig('./' + file_name + '/' + head_name + '.pdf')
+    f.savefig(save_dir + head_name +  '_%d.pdf' % chunk)
 
 def get_X_y(path):
 
@@ -167,13 +189,13 @@ def get_X_y(path):
     head_signals = np.asarray([np.asarray(head_data[key]) for key in head_data.keys()][0:9]).T[:,idx_start:idx_stop]
     print('head_signals shape: ', head_signals.shape) ## samples x features
 
-    mua_file = h5py.File('./' + path + '/mua_firing_rates_100hz.hdf5','r')
+    mua_file = h5py.File('./' + path + '/sua_firing_rates_100hz.hdf5','r')
 
     mua = mua_file['firing_rates'][:]
 
     mua_file.close()
 
-    limit = int(6e5)
+    limit = int(6e9)
     if mua.shape[0] > limit:
         print('Reducing Data Size Down to %d Samples' % limit)
         mua  = mua[0:limit,:]
@@ -184,7 +206,11 @@ def get_X_y(path):
 
 if __name__ == "__main__":
 
-
+    input_file_path = os.getcwd()
+    all_files = []
+    for file in os.listdir(input_file_path):
+            if file.startswith("636"):
+                all_files.append(file)
     ### GRat26:
     # all_files = ['636444372823550001',
     #             '636455956910510001',
@@ -196,13 +222,13 @@ if __name__ == "__main__":
     #             '636463456945299197',
     #             '636464513098770001',
     #             '636465322265480001']
-    all_files =  [
-                    '636461785781685886',
-                    '636462564120970001',
-                    '636464402756620001',
-                    '636465208859170001',
+    # all_files =  [
+    #                 '636461785781685886',
+    #                 '636462564120970001',
+    #                 '636464402756620001',
+    #                 '636465208859170001',
 
-                ]
+    #             ]
 
     ### GRat31
     # all_files = ['636426429249996956',
@@ -224,17 +250,42 @@ if __name__ == "__main__":
 
 
     for fil in all_files:
-
-        mua,head_signals = get_X_y(fil)
+        print('Processing file %s' % fil)
+        mua,head_signals = get_X_y(fil) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
         head_names = ['dx','dy','dz']
         
-        for i in range(3):
-            derivative = head_signals[:,3+i]
+        two_hour_lim = int(100*60*60*2)
+        
+        start,stop = 0,get_head_stop(head_signals)
+        
+        head_signals = head_signals[start:stop,:]
+        mua = mua[:,start:stop]
+        
+        num_chunks = max(1,int(head_signals.shape[0] / two_hour_lim)) ## how many two-hour chunks of decoding can we do using this dataset?
 
-            y_left,y_right,X_left,X_right = extract_peak_windows(mua,derivative)
+        # split tetrodes and head data into chunks:
+        chunk_indexes = [two_hour_lim*i for i in range(num_chunks+1)] ## get indexes like [0, 720000] [720000, 1440000] [1440000, 2160000]
+        chunk_indexes = [[v, w] for v, w in zip(chunk_indexes[:-1], chunk_indexes[1:])] # reformat to one list
+        print('chunk_indexes =  ', chunk_indexes)
 
-            plot(y_left,y_right,X_left,X_right,head_names[i],fil)
+        all_mua = [mua[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ] ## list of 1x16x720000 chunks
+        all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
-            np.savez('./' + fil + '/' + head_names[i] + '.npz',y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+        sua_path = './'
+        save_path = sua_path + '/sua_turns/'
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+
+        for chunk in range(num_chunks):
+
+            for i in range(3):
+                derivative = all_head_signals[chunk][:,3+i]
+
+                print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
+                y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
+
+                plot(y_left,y_right,X_left,X_right,head_names[i],save_path,chunk)
+
+                np.savez(save_path + head_names[i] + '_%d.npz' % chunk,y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
 
 
