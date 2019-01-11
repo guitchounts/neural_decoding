@@ -282,6 +282,7 @@ if __name__ == "__main__":
             #sua_path = './'
             save_path = sua_path + '/sua_turns/'
             if not os.path.exists(save_path):
+                print('Making save_path %s' % save_path)
                 os.makedirs(save_path)
 
             for chunk in range(num_chunks):
