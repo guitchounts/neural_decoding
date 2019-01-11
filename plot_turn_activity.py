@@ -279,7 +279,7 @@ if __name__ == "__main__":
             all_mua = [mua[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ] ## list of 1x16x720000 chunks
             all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
-            sua_path = './'
+            #sua_path = './'
             save_path = sua_path + '/sua_turns/'
             if not os.path.exists(save_path):
                 os.makedirs(save_path)
