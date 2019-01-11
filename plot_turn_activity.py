@@ -290,7 +290,7 @@ if __name__ == "__main__":
                     derivative = all_head_signals[chunk][:,3+i]
 
                     print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
-                    y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
+                    y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative,standardize=0)
 
                     plot(y_left,y_right,X_left,X_right,head_names[i],save_path,chunk)
 
