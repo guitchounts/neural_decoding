@@ -181,15 +181,15 @@ def plot(y_left,y_right,X_left,X_right,head_name,save_dir,chunk):
 
     f.savefig(save_dir + head_name +  '_%d.pdf' % chunk)
 
-def get_X_y(path):
+def get_X_y(sua_path,head_path):
 
-    head_data = h5py.File('./'+ path +'/' + 'all_head_data_100hz.hdf5','r')
+    head_data = h5py.File(head_path +'/' + 'all_head_data_100hz.hdf5','r')
 
     idx_start, idx_stop = [0,9]
     head_signals = np.asarray([np.asarray(head_data[key]) for key in head_data.keys()][0:9]).T[:,idx_start:idx_stop]
     print('head_signals shape: ', head_signals.shape) ## samples x features
 
-    mua_file = h5py.File('./' + path + '/sua_firing_rates_100hz.hdf5','r')
+    mua_file = h5py.File(sua_path + '/sua_firing_rates_100hz.hdf5','r')
 
     mua = mua_file['firing_rates'][:]
 
@@ -248,44 +248,52 @@ if __name__ == "__main__":
     #              '636439502672505948',
     #              '636440035877005948']
 
+    rats_fils = {'GRat27': ['636510937083046658', '636509978479552658', '636510084452580867', '636511805224164658', '636510082656610482', '636511097148040658'],
+    'GRat31': ['636431765535543697', '636430663717571697', '636432491422312001', '636429016120323973'],
+    'GRat36': ['636505711113835062', '636506637266525062', '636505777557065062', '636507739593079062', '636507484919009062'] }
+    #'GRat54': ['636721705080978997', '636722548531708203', '636722133826360203', '636722941618790032', '636721697520325138', '636722535366378203'] }
+    for rat in rats_fils.keys():
 
-    for fil in all_files:
-        print('Processing file %s' % fil)
-        mua,head_signals = get_X_y(fil) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
-        head_names = ['dx','dy','dz']
-        
-        two_hour_lim = int(100*60*60*2)
-        
-        start,stop = 0,get_head_stop(head_signals)
-        
-        head_signals = head_signals[start:stop,:]
-        mua = mua[:,start:stop]
-        
-        num_chunks = max(1,int(head_signals.shape[0] / two_hour_lim)) ## how many two-hour chunks of decoding can we do using this dataset?
+        #for fil in all_files:
+        for fil in rats_fils[rat]:
+            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
+            print('Processing rat %s file %s' % (rat,fil))
 
-        # split tetrodes and head data into chunks:
-        chunk_indexes = [two_hour_lim*i for i in range(num_chunks+1)] ## get indexes like [0, 720000] [720000, 1440000] [1440000, 2160000]
-        chunk_indexes = [[v, w] for v, w in zip(chunk_indexes[:-1], chunk_indexes[1:])] # reformat to one list
-        print('chunk_indexes =  ', chunk_indexes)
+            mua,head_signals = get_X_y(sua_path,sua_path) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
+            head_names = ['dx','dy','dz']
+            
+            two_hour_lim = int(100*60*60*2)
+            
+            start,stop = 0,get_head_stop(head_signals)
+            
+            head_signals = head_signals[start:stop,:]
+            mua = mua[:,start:stop]
+            
+            num_chunks = max(1,int(head_signals.shape[0] / two_hour_lim)) ## how many two-hour chunks of decoding can we do using this dataset?
 
-        all_mua = [mua[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ] ## list of 1x16x720000 chunks
-        all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
+            # split tetrodes and head data into chunks:
+            chunk_indexes = [two_hour_lim*i for i in range(num_chunks+1)] ## get indexes like [0, 720000] [720000, 1440000] [1440000, 2160000]
+            chunk_indexes = [[v, w] for v, w in zip(chunk_indexes[:-1], chunk_indexes[1:])] # reformat to one list
+            print('chunk_indexes =  ', chunk_indexes)
 
-        sua_path = './'
-        save_path = sua_path + '/sua_turns/'
-        if not os.path.exists(save_path):
-            os.makedirs(save_path)
+            all_mua = [mua[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ] ## list of 1x16x720000 chunks
+            all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
-        for chunk in range(num_chunks):
+            sua_path = './'
+            save_path = sua_path + '/sua_turns/'
+            if not os.path.exists(save_path):
+                os.makedirs(save_path)
 
-            for i in range(3):
-                derivative = all_head_signals[chunk][:,3+i]
+            for chunk in range(num_chunks):
 
-                print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
-                y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
+                for i in range(3):
+                    derivative = all_head_signals[chunk][:,3+i]
 
-                plot(y_left,y_right,X_left,X_right,head_names[i],save_path,chunk)
+                    print('all_mua[chunk].shape,derivative.shape', all_mua[chunk].shape,derivative.shape)
+                    y_left,y_right,X_left,X_right = extract_peak_windows(all_mua[chunk],derivative)
 
-                np.savez(save_path + head_names[i] + '_%d.npz' % chunk,y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
+                    plot(y_left,y_right,X_left,X_right,head_names[i],save_path,chunk)
+
+                    np.savez(save_path + head_names[i] + '_%d.npz' % chunk,y_left=y_left,y_right=y_right,X_left=X_left,X_right=X_right)
 
 
