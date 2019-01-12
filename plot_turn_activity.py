@@ -259,10 +259,11 @@ if __name__ == "__main__":
 
         #for fil in all_files:
         for fil in rats_fils[rat]:
-            sua_path = '/n/coxfs01/guitchounts/ephys/%s/Analysis/%s/' % (rat,fil)
+            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
+            head_path = '/n/coxfs01/guitchounts/ephys/%s/Analysis/%s/' % (rat,fil)
             print('Processing rat %s file %s' % (rat,fil))
 
-            mua,head_signals = get_X_y(sua_path,sua_path) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
+            mua,head_signals = get_X_y(sua_path,head_path) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
             head_names = ['dx','dy','dz']
             
             two_hour_lim = int(100*60*60*2)
@@ -283,7 +284,7 @@ if __name__ == "__main__":
             all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
             #sua_path = './'
-            save_path = sua_path + '/sua_turns/'
+            save_path = head_path + '/sua_turns/'
             if not os.path.exists(save_path):
                 print('Making save_path %s' % save_path)
                 os.makedirs(save_path)
