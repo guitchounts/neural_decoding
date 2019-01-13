@@ -261,9 +261,19 @@ if __name__ == "__main__":
 
         #for fil in all_files:
         for fil in rats_fils[rat]:
-            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
-            head_path = '/n/coxfs01/guitchounts/ephys/%s//%s/' % (rat,fil) ### Analysis between the // for GRat54
             print('Processing rat %s file %s' % (rat,fil))
+
+
+            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
+            head_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil) ### Analysis between the // for GRat54
+            
+            ### if paths are not right (i.e. if file is under Analysis folder:)
+            idx = head_path.find(fil)
+            if os.path.isfile(head_path) == False:
+                head_path = head_path[:idx] + '/Analysis/' + head_path[idx:]
+            if os.path.isfile(sua_path) == False:
+                sua_path = sua_path[:idx] + '/Analysis/' + sua_path[idx:]
+
 
             mua,head_signals = get_X_y(sua_path,head_path) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
             head_names = ['dx','dy','dz']
