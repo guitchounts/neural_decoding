@@ -261,7 +261,7 @@ if __name__ == "__main__":
         #for fil in all_files:
         for fil in rats_fils[rat]:
             sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
-            head_path = '/n/coxfs01/guitchounts/ephys/%s/Analysis/%s/' % (rat,fil)
+            head_path = '/n/coxfs01/guitchounts/ephys/%s//%s/' % (rat,fil) ### Analysis between the // for GRat54
             print('Processing rat %s file %s' % (rat,fil))
 
             mua,head_signals = get_X_y(sua_path,head_path) # mua shape = time x tetrodes; head_signals shape = time x acc variables 
