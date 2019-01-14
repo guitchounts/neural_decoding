@@ -184,13 +184,13 @@ def plot(y_left,y_right,X_left,X_right,head_name,save_dir,chunk):
 
 def get_X_y(sua_path,head_path):
 
-    head_data = h5py.File(head_path +'/' + 'all_head_data_100hz.hdf5','r')
+    head_data = h5py.File(head_path,'r')
 
     idx_start, idx_stop = [0,9]
     head_signals = np.asarray([np.asarray(head_data[key]) for key in head_data.keys()][0:9]).T[:,idx_start:idx_stop]
     print('head_signals shape: ', head_signals.shape) ## samples x features
 
-    mua_file = h5py.File(sua_path + '/sua_firing_rates_100hz.hdf5','r')
+    mua_file = h5py.File(sua_path,'r')
 
     mua = mua_file['firing_rates'][:]
 
@@ -265,8 +265,8 @@ if __name__ == "__main__":
             print('Processing rat %s file %s' % (rat,fil))
 
 
-            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil)
-            head_path = '/n/coxfs01/guitchounts/ephys/%s/%s/' % (rat,fil) ### Analysis between the // for GRat54
+            sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/sua_firing_rates_100hz.hdf5' % (rat,fil)
+            head_path = '/n/coxfs01/guitchounts/ephys/%s/%s/all_head_data_100hz.hdf5' % (rat,fil) ### Analysis between the // for GRat54
             
             ### if paths are not right (i.e. if file is under Analysis folder:)
             idx = head_path.find(fil)
