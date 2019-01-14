@@ -267,7 +267,7 @@ if __name__ == "__main__":
 
             sua_path = '/n/coxfs01/guitchounts/ephys/%s/%s/sua_firing_rates_100hz.hdf5' % (rat,fil)
             head_path = '/n/coxfs01/guitchounts/ephys/%s/%s/all_head_data_100hz.hdf5' % (rat,fil) ### Analysis between the // for GRat54
-            
+            save_path = '/n/coxfs01/guitchounts/ephys/%s/%s/sua_turns/' % (rat,fil)
             ### if paths are not right (i.e. if file is under Analysis folder:)
             idx = head_path.find(fil)
             if os.path.isfile(head_path) == False:
@@ -297,7 +297,7 @@ if __name__ == "__main__":
             all_head_signals = [head_signals[chunk_indexes[chunk][0]:chunk_indexes[chunk][1],:] for chunk in range(num_chunks)  ]
 
             #sua_path = './'
-            save_path = head_path + '/sua_turns/'
+            #save_path = save_path + '/sua_turns/'
             if not os.path.exists(save_path):
                 print('Making save_path %s' % save_path)
                 os.makedirs(save_path)
